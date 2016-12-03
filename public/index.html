@@ -461,7 +461,7 @@
 <div id="timer" style="display: inline-block; text-align: left; width: 175px;"></div></span>
     <ul class="nav navbar-nav navbar-left">
       <li>
-        <div id="HistorySketchesView">
+        <div id="HistorySketchesView" class="minisketches">
         </div>
       </li>
       <li>
@@ -538,10 +538,14 @@
 
 
       <div id="PadView" class="col-xs-1">
-          <div id=PreviewContainer" style="position: fixed; overflow: auto; display: inline-block;">
+          <div id="PreviewContainer">
+			  <div id="PreviewCostHeader">
+			    currently
+			  	<span id="PreviewCost">$123</span>
+			  </div>
               <div id="Preview">
 	      </div>
-              <div id="PreviewHistory">
+              <div id="PreviewHistory" class="minisketches">
               </div>
           </div>
       </div>
