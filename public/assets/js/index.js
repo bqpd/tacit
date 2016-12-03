@@ -75,7 +75,7 @@ function initialize(structure) {
 					},
                     parseFloat(beamData.size)
                 );
-				beam.immovable = (beamData.immovable === "true");
+				beam.immovable = beamData.immovable;
                 beams.push(beam);
             }
             var nodes =[];
@@ -115,7 +115,7 @@ function initialize(structure) {
                         z: 0
                     };
                 }
-				node.immovable = (nodeData.immovable === "true");
+				node.immovable = nodeData.immovable;
                 nodes.push(node);
             }
             // todo: don't hardcode starting nodes
