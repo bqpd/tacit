@@ -462,7 +462,7 @@
         _results = [];
         for (_k = 0, _len2 = _ref7.length; _k < _len2; _k++) {
           b = _ref7[_k];
-          _results.push("" + b.source.x + ", " + b.source.y + " >> " + b.target.x + ", " + b.target.y + " | " + b.size);
+          _results.push("" + b.source.x + ", " + b.source.y + ", " + b.source.z + " >> " + b.target.x + ", " + b.target.y + ", " + b.target.z + "|" + b.size + "|" + b.immovable);
         }
         return _results;
       }).call(this)).join("\n");
@@ -472,7 +472,7 @@
         _results = [];
         for (_k = 0, _len2 = _ref7.length; _k < _len2; _k++) {
           n = _ref7[_k];
-          _results.push("" + n.x + " " + n.y);
+          _results.push("" + n.x + " " + n.y + " " + n.z + "|" + n.fixed.x + " " + n.fixed.y + " " + n.fixed.z + "|" + n.force.x + " " + n.force.y + " " + n.force.z + "|" + n.immovable);
         }
         return _results;
       }).call(this)).join("\n");
