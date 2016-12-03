@@ -40,7 +40,7 @@
         data = data[0].split(/\>\>/);
         start = data[0].split(/\,/);
         end = data[1].split(/\,/);
-        immovable = parseInt(data[2]) === "true";
+        immovable = data[2] === "true";
         beamObjs.push({
           size: size.replace(/^\s+|\s+$/g, ""),
           start_x: start[0].replace(/^\s+|\s+$/g, ""),
@@ -60,7 +60,7 @@
         coordinatesData = data[0].split(" ");
         fixedData = data[1].split(" ");
         forceData = data[2].split(" ");
-        immovable = parseInt(data[3]) === "true";
+        immovable = data[3] === "true";
         nodeObjs.push({
           x: coordinatesData[0],
           y: coordinatesData[1],
@@ -136,7 +136,7 @@
           data = data[0].split(/\>\>/);
           start = data[0].split(/\,/);
           end = data[1].split(/\,/);
-          immovable = parseInt(data[2]) === "true";
+          immovable = data[2] === "true";
           beamObjs.push({
             size: size.replace(/^\s+|\s+$/g, ""),
             start_x: start[0].replace(/^\s+|\s+$/g, ""),
@@ -156,7 +156,7 @@
           coordinatesData = data[0].split(" ");
           fixedData = data[1].split(" ");
           forceData = data[2].split(" ");
-          immovableData = parseInt(data[3]) === "true";
+          immovableData = data[3] === "true";
           nodeObjs.push({
             x: coordinatesData[0],
             y: coordinatesData[1],
