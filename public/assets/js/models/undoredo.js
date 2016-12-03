@@ -226,7 +226,7 @@
             size: size.replace(/^\s+|\s+$/g, ""),
             start_x: start[0].replace(/^\s+|\s+$/g, ""),
             start_y: start[1].replace(/^\s+|\s+$/g, ""),
-            start_1: start[2].replace(/^\s+|\s+$/g, ""),
+            start_z: start[2].replace(/^\s+|\s+$/g, ""),
             end_x: end[0].replace(/^\s+|\s+$/g, ""),
             end_y: end[1].replace(/^\s+|\s+$/g, ""),
             end_z: end[2].replace(/^\s+|\s+$/g, ""),
