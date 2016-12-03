@@ -25,6 +25,7 @@
       this.project.actionQueue = [structure];
       undoredo.pointer = 0;
       structure = new tacit.Structure(structure);
+      structure.last_edit = this.versions.history[this.i].sketch.structure.last_edit;
       this.versions.project.easel.pad.load(structure);
       this.versions.project.easel.pad.sketch.feapad = window.feapadpad;
       this.versions.project.easel.pad.sketch.updateDrawing();
@@ -78,15 +79,27 @@
           immovable: immovable
         });
       }
-      firebase.database().ref(window.sessionid + "/" + window.usernum + "/" + window.problem_order + '/structures/').push().set({
-        timestamp: new Date().toLocaleString(),
-        weight: structure.lp.obj,
-        nodes: project.easel.pad.sketch.structure.nodeList.length,
-        beams: project.easel.pad.sketch.structure.beamList.length,
-        tool: "load",
-        beamList: beamObjs,
-        nodeList: nodeObjs
-      });
+      if (structure.last_edit === window.usernum) {
+        firebase.database().ref(window.sessionid + "/" + window.usernum + "/" + window.problem_order + '/structures/').push().set({
+          timestamp: new Date().toLocaleString(),
+          weight: structure.lp.obj,
+          nodes: project.easel.pad.sketch.structure.nodeList.length,
+          beams: project.easel.pad.sketch.structure.beamList.length,
+          tool: "load from self",
+          beamList: beamObjs,
+          nodeList: nodeObjs
+        });
+      } else {
+        firebase.database().ref(window.sessionid + "/" + window.usernum + "/" + window.problem_order + '/structures/').push().set({
+          timestamp: new Date().toLocaleString(),
+          weight: structure.lp.obj,
+          nodes: project.easel.pad.sketch.structure.nodeList.length,
+          beams: project.easel.pad.sketch.structure.beamList.length,
+          tool: "load from teammate",
+          beamList: beamObjs,
+          nodeList: nodeObjs
+        });
+      }
       return false;
     };
 
@@ -108,8 +121,9 @@
 
   Versions = (function() {
 
-    function Versions(project, newVersion) {
+    function Versions(project, preview, usernum, newVersion) {
       this.project = project;
+      this.preview = preview;
       this.htmlLoc = "#HistorySketchesView";
       this.previewHtmlLoc = "#PreviewHistory";
       this.history = [];
@@ -175,6 +189,7 @@
           });
         }
         structure.solve();
+        structure.last_edit = window.usernum;
         firebase.database().ref(window.sessionid + "/" + window.usernum + "/" + window.problem_order + '/events/').push().set({
           type: "save",
           timestamp: new Date().toLocaleString(),
@@ -183,7 +198,8 @@
           nodeList: nodeObjs,
           beamList: beamObjs,
           historyLength: this.history.length,
-          weight: structure.lp.obj
+          weight: structure.lp.obj,
+          last_edit: usernum
         });
         versionObj = d3.select(this.htmlLoc).append("div").attr("id", "ver" + window.usernum + "-" + this.history.length).classed("ver", true);
         easel = new dummyEasel(this, this.history.length, this.project);
@@ -225,6 +241,20 @@
       previewPad.sketch.showforce = false;
       previewPad.sketch.updateDrawing();
       this.history.push(previewPad);
+      structure.solve();
+      return previewPad.sketch.fea();
+    };
+
+    Versions.prototype.updatePreview = function(structure) {
+      var genhelper, previewPad;
+      if (!(structure != null)) {
+        structure = new tacit.Structure(this.preview.easel.pad.sketch.structure);
+      }
+      this.preview.easel.pad.sketch.fea();
+      previewPad = this.preview.easel.pad;
+      previewPad.load(structure, genhelper = false);
+      previewPad.sketch.showforce = false;
+      previewPad.sketch.updateDrawing();
       structure.solve();
       return previewPad.sketch.fea();
     };

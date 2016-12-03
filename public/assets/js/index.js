@@ -28,6 +28,7 @@ function initialize(structure) {
 	window.preview.easel.mouseMove = function(){return;}
 	window.preview.easel.allowPan = function(){return;}
 
+	// Provides live updates of teammate's structure
 	window.db.structures_ref0.on('child_added', function(snapshot, prevChildKey) {
 	    if (window.usernum == 1) {
                 updatePreview(snapshot, prevChildKey);
@@ -39,7 +40,9 @@ function initialize(structure) {
                 updatePreview(snapshot, prevChildKey);
             }
 	});
-	var previewVersions = new tacit.Versions(window.project, false);
+
+	// Provides live updates of teammate's history
+	var previewVersions = new tacit.Versions(window.project, window.preview, window.usernum, false);
 	window.db.events_ref0.on('child_added', function(snapshot, prevChildKey) {
             if(window.usernum == 1 && snapshot.val().type == "save") {
                 structure = getStructureFromSnapshot(snapshot.val());
@@ -54,8 +57,18 @@ function initialize(structure) {
 	});
     var updatePreview = function(snapshot, prevChildKey) {
             structure = getStructureFromSnapshot(snapshot.val());
-            window.preview.easel.pad.load(structure);
+			console.log("updatePreview structure = ", structure);
+			previewVersions.updatePreview(structure);
+			/*
+            console.log("updatePreview: structure = ", structure);
+            console.log("updatePreview after solve: structure = ", structure);
+            window.preview.easel.pad.load(structure, genhelper=false);
+            window.preview.easel.pad.nodeSize = 0;
+            window.preview.easel.pad.showforce = false;
             window.preview.easel.pad.sketch.updateDrawing();
+			structure.solve();
+            window.preview.easel.pad.sketch.fea();
+			*/
             return;
     }
     var getStructureFromSnapshot = function(structureData) {
@@ -139,6 +152,7 @@ function initialize(structure) {
             structure.nodeList = nodes;
             structure.beams = structureData.beams;
             structure.nodes = structureData.nodes;
+			structure.last_edit = structureData.last_edit;
             structure.historyLength = structureData.historyLength;
             structure.lp = {obj: structureData.weight};
             return structure;
@@ -282,7 +296,7 @@ function initialize(structure) {
                 });
 		project.easel.pad.sketch.fea()})
 
-	versions = new tacit.Versions(window.project, true);
+	versions = new tacit.Versions(window.project, window.preview, window.usernum, true);
 	undoredo = new tacit.UndoRedo(window.project)
 
 	$(".notyet").removeClass("notyet")
