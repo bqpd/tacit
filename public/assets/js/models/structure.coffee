@@ -194,8 +194,8 @@ class Structure
                 localnode.force = {x: node.force.x, y: node.force.y, z: node.force.z}
                 localnode.immovable = node.immovable
 
-        @strucstr = ("#{b.source.x}, #{b.source.y}, #{b.source.z} >> #{b.target.x}, #{b.target.y}, #{b.target.z}|#{b.size}|#{b.immovable}" for b in @beamList).join("\n")
-        @nodestr = ("#{n.x} #{n.y} #{n.z}|#{n.fixed.x} #{n.fixed.y} #{n.fixed.z}|#{n.force.x} #{n.force.y} #{n.force.z}|#{n.immovable}" for n in @nodeList).join("\n")
+        @strucstr = ("#{b.source.x}, #{b.source.y}, #{b.source.z} >> #{b.target.x}, #{b.target.y}, #{b.target.z}|#{b.size}|#{b.immovable == true}" for b in @beamList).join("\n")
+        @nodestr = ("#{n.x} #{n.y} #{n.z}|#{n.fixed.x} #{n.fixed.y} #{n.fixed.z}|#{n.force.x} #{n.force.y} #{n.force.z}|#{n.immovable == true}" for n in @nodeList).join("\n")
 
     solve: ->
         try

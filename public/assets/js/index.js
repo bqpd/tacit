@@ -120,10 +120,18 @@ function initialize(structure) {
             }
             // todo: don't hardcode starting nodes
             if (nodes.length == 0) {
-                nodes.push(new tacit.Node({x: 42, y: 72, z: 0}));
-                nodes.push(new tacit.Node({x: 42, y: 97, z: 0}));
-                nodes.push(new tacit.Node({x: 20, y: 1.65, z: 0}));
-                nodes.push(new tacit.Node({x: 60, y: 1.65, z: 0}));
+                n1 = new tacit.Node({x: 42, y: 72, z: 0});
+                n1.immovable = true;
+                n2 = new tacit.Node({x: 42, y: 97, z: 0});
+                n2.immovable = true;
+                n3 = new tacit.Node({x: 20, y: 1.65, z: 0});
+                n3.immovable = true;
+                n4 = new tacit.Node({x: 60, y: 1.65, z: 0});
+                n4.immovable = true;
+				nodes.push(n1);
+				nodes.push(n2);
+				nodes.push(n3);
+				nodes.push(n4);
             }
             structure = new tacit.Structure(null);
             structure.beamList = beams;

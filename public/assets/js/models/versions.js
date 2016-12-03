@@ -117,7 +117,7 @@
     }
 
     Versions.prototype.newVersion = function(structure, newVersion) {
-      var beam, beamObjs, beams, coordinatesData, data, easel, end, fixedData, forceData, genhelper, immovable, immovableData, node, nodeObjs, nodes, pad, saved, size, start, versionObj, _i, _j, _len, _len1, _ref1;
+      var beam, beamObjs, beams, coordinatesData, data, easel, end, fixedData, forceData, genhelper, immovable, node, nodeObjs, nodes, pad, saved, size, start, versionObj, _i, _j, _len, _len1, _ref1;
       if (newVersion) {
         if (!(structure != null)) {
           structure = new tacit.Structure(this.project.easel.pad.sketch.structure);
@@ -156,7 +156,7 @@
           coordinatesData = data[0].split(" ");
           fixedData = data[1].split(" ");
           forceData = data[2].split(" ");
-          immovableData = data[3] === "true";
+          immovable = data[3] === "true";
           nodeObjs.push({
             x: coordinatesData[0],
             y: coordinatesData[1],

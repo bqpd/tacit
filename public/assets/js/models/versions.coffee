@@ -109,7 +109,7 @@ class Versions
                 coordinatesData = data[0].split(" ")
                 fixedData = data[1].split(" ")
                 forceData = data[2].split(" ")
-                immovableData = (data[3] == "true")
+                immovable = (data[3] == "true")
                 nodeObjs.push
                     x: coordinatesData[0]
                     y: coordinatesData[1]
