@@ -273,17 +273,14 @@ h2 {
 	position: relative;
 }
 
-#PadView svg {
-	border: 1px solid #d4d4d4;
-}
-
 #Preview {
 	z-index: 100;
-	margin: 10px;
-	padding: 10px;
+	margin: 12px;
+	padding: 12px;
 	position: relative;
-	border: solid;
+	border: 2px solid white;
 	background-color: #d4d4d4;
+	border-radius: 2px;
 }
 
 #Preview  svg {
@@ -471,54 +468,44 @@ wm {
 	font-weight: 400;
 }
 
-#HistorySketchesView {
+.minisketches {
 	overflow-y: hidden;
 	white-space: nowrap;
 	overflow-x: scroll;
+}
+
+.minisketches .ver {
+	display: inline-block;
+}
+
+.minisketches .versvg {
+	display: inline;
+}
+
+.minisketches .verwd {
+	display: block;
+	height: 27px;
+	width: 50px;
+    text-align: center;
+	color: white;
+}
+
+#HistorySketchesView {
 	text-align: right;
 	max-width: 350px;
 }
 
 #PreviewHistory {
-	overflow-y: hidden;
-	white-space: nowrap;
-	overflow-x: scroll;
 	max-width: 250px;
+	padding-left: 12px;
 }
 
 #HistorySketchesView .ver {
-	display: inline-block;
 	color: rgba(255,255,255,0.9);
-}
-
-#PreviewHistory .ver {
-	display: inline-block;
 }
 
 #HistorySketchesView .ver:hover {
 	color: white;
-}
-
-#HistorySketchesView .versvg {
-	display: inline;
-}
-
-#PreviewHistory .versvg {
-	display: inline;
-}
-
-#HistorySketchesView .verwd {
-	display: block;
-	height: 27px;
-	width: 50px;
-    text-align: center;
-}
-
-#PreviewHistory .verwd {
-	display: block;
-	height: 27px;
-	width: 50px;
-    text-align: center;
 }
 
 #textbtns button {
@@ -526,6 +513,31 @@ wm {
 }
 
 #designweight {
+	font-weight: 400;
+	font-style: normal;
+	font-size: 1.5em;
+}
+
+
+#PreviewContainer {
+	position: fixed;
+	overflow: auto;
+	display: inline-block;
+	background: #2eabe2;
+	border-radius: 8px;
+	right: 0;
+	bottom: 0;
+}
+
+#PreviewCostHeader {
+	color: white;
+	text-align: center;
+	font-weight: 200;
+	font-style: italic;
+	font-size: 1.2em;
+}
+
+#PreviewCost {
 	font-weight: 400;
 	font-style: normal;
 	font-size: 1.5em;

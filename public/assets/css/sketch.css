@@ -13,12 +13,12 @@
 
 #helper { fill: #e14a4e; }
 
-#HistorySketchesView svg .link {
+.minisketches svg .link {
     transition: all 0.3s;
     opacity: 1 !important;
 }
 
-#HistorySketchesView svg:not(:hover) .link {
+.minisketches svg:not(:hover) .link {
 	stroke: white;
 	stroke-width: 3px !important;
 }
