@@ -16,7 +16,7 @@
     }
 
     dummyEasel.prototype.mouseDown = function(easel, eventType, mouseLoc, object) {
-      var beam, beamObjs, beams, data, end, node, nodeObjs, nodes, size, start, structure, _i, _j, _len, _len1;
+      var beam, beamObjs, beams, coordinatesData, data, end, fixedData, forceData, immovable, node, nodeObjs, nodes, size, start, structure, _i, _j, _len, _len1;
       if (window.triggers.load != null) {
         window.triggers.load();
       }
@@ -40,22 +40,42 @@
         data = data[0].split(/\>\>/);
         start = data[0].split(/\,/);
         end = data[1].split(/\,/);
+        immovable = parseInt(data[2]) === "true";
         beamObjs.push({
           size: size.replace(/^\s+|\s+$/g, ""),
           start_x: start[0].replace(/^\s+|\s+$/g, ""),
           start_y: start[1].replace(/^\s+|\s+$/g, ""),
+          start_z: start[2].replace(/^\s+|\s+$/g, ""),
           end_x: end[0].replace(/^\s+|\s+$/g, ""),
-          end_y: end[1].replace(/^\s+|\s+$/g, "")
+          end_y: end[1].replace(/^\s+|\s+$/g, ""),
+          end_z: end[2].replace(/^\s+|\s+$/g, ""),
+          immovable: immovable
         });
       }
       nodeObjs = [];
       nodes = structure.nodestr.split(/\r?\n/);
       for (_j = 0, _len1 = nodes.length; _j < _len1; _j++) {
         node = nodes[_j];
-        data = node.split(" ");
+        data = node.split(/\|/);
+        coordinatesData = data[0].split(" ");
+        fixedData = data[1].split(" ");
+        forceData = data[2].split(" ");
+        immovable = parseInt(data[3]) === "true";
         nodeObjs.push({
-          x: data[0],
-          y: data[1]
+          x: coordinatesData[0],
+          y: coordinatesData[1],
+          z: coordinatesData[2],
+          fixed: {
+            x: fixedData[0],
+            y: fixedData[1],
+            z: fixedData[2]
+          },
+          force: {
+            x: forceData[0],
+            y: forceData[1],
+            z: forceData[2]
+          },
+          immovable: immovable
         });
       }
       firebase.database().ref(window.sessionid + "/" + window.usernum + "/" + window.problem_order + '/structures/').push().set({
@@ -97,7 +117,7 @@
     }
 
     Versions.prototype.newVersion = function(structure, newVersion) {
-      var beam, beamObjs, beams, data, easel, end, genhelper, node, nodeObjs, nodes, pad, saved, size, start, versionObj, _i, _j, _len, _len1, _ref1;
+      var beam, beamObjs, beams, coordinatesData, data, easel, end, fixedData, forceData, genhelper, immovable, immovableData, node, nodeObjs, nodes, pad, saved, size, start, versionObj, _i, _j, _len, _len1, _ref1;
       if (newVersion) {
         if (!(structure != null)) {
           structure = new tacit.Structure(this.project.easel.pad.sketch.structure);
@@ -116,22 +136,42 @@
           data = data[0].split(/\>\>/);
           start = data[0].split(/\,/);
           end = data[1].split(/\,/);
+          immovable = parseInt(data[2]) === "true";
           beamObjs.push({
             size: size.replace(/^\s+|\s+$/g, ""),
             start_x: start[0].replace(/^\s+|\s+$/g, ""),
             start_y: start[1].replace(/^\s+|\s+$/g, ""),
+            start_z: start[2].replace(/^\s+|\s+$/g, ""),
             end_x: end[0].replace(/^\s+|\s+$/g, ""),
-            end_y: end[1].replace(/^\s+|\s+$/g, "")
+            end_y: end[1].replace(/^\s+|\s+$/g, ""),
+            end_z: end[2].replace(/^\s+|\s+$/g, ""),
+            immovable: immovable
           });
         }
         nodeObjs = [];
         nodes = structure.nodestr.split(/\r?\n/);
         for (_j = 0, _len1 = nodes.length; _j < _len1; _j++) {
           node = nodes[_j];
-          data = node.split(" ");
+          data = node.split(/\|/);
+          coordinatesData = data[0].split(" ");
+          fixedData = data[1].split(" ");
+          forceData = data[2].split(" ");
+          immovableData = parseInt(data[3]) === "true";
           nodeObjs.push({
-            x: data[0],
-            y: data[1]
+            x: coordinatesData[0],
+            y: coordinatesData[1],
+            z: coordinatesData[2],
+            fixed: {
+              x: fixedData[0],
+              y: fixedData[1],
+              z: fixedData[2]
+            },
+            force: {
+              x: forceData[0],
+              y: forceData[1],
+              z: forceData[2]
+            },
+            immovable: immovable
           });
         }
         structure.solve();
@@ -173,6 +213,7 @@
       if (!(structure != null)) {
         structure = new tacit.Structure(this.project.easel.pad.sketch.structure);
       }
+      this.project.easel.pad.sketch.fea();
       previewVersionObj = d3.select("#PreviewHistory").append("div").attr("id", "ver" + window.partnernum + "-" + structure.historyLength).classed("ver", true);
       previewEasel = new dummyEasel(this, structure.historyLength, this.project);
       previewVersionObj.append("div").attr("id", "versvg" + window.partnernum + "-" + structure.historyLength).classed("versvg", true);
@@ -183,7 +224,9 @@
       previewPad.sketch.nodeSize = 0;
       previewPad.sketch.showforce = false;
       previewPad.sketch.updateDrawing();
-      return this.history.push(previewPad);
+      this.history.push(previewPad);
+      structure.solve();
+      return previewPad.sketch.fea();
     };
 
     Versions.prototype.save = function(structure) {

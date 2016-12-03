@@ -25,19 +25,37 @@ class dummyEasel
             data = data[0].split(/\>\>/)
             start = data[0].split(/\,/)
             end = data[1].split(/\,/)
+            immovable = (parseInt(data[2]) == "true")
             beamObjs.push
                 size: size.replace /^\s+|\s+$/g, ""
                 start_x: start[0].replace /^\s+|\s+$/g, ""
                 start_y: start[1].replace /^\s+|\s+$/g, ""
+                start_z: start[2].replace /^\s+|\s+$/g, ""
                 end_x: end[0].replace /^\s+|\s+$/g, ""
                 end_y: end[1].replace /^\s+|\s+$/g, ""
+                end_z: end[2].replace /^\s+|\s+$/g, ""
+                immovable: immovable
         nodeObjs = []
         nodes = structure.nodestr.split(/\r?\n/)
         for node in nodes
-            data = node.split(" ")
+            data = node.split(/\|/)
+            coordinatesData = data[0].split(" ")
+            fixedData = data[1].split(" ")
+            forceData = data[2].split(" ")
+            immovable = (parseInt(data[3]) == "true")
             nodeObjs.push
-                x: data[0]
-                y: data[1]
+                x: coordinatesData[0]
+                y: coordinatesData[1]
+                z: coordinatesData[2]
+                fixed:
+                    x: fixedData[0]
+                    y: fixedData[1]
+                    z: fixedData[2]
+                force:
+                    x: forceData[0]
+                    y: forceData[1]
+                    z: forceData[2]
+                immovable: immovable
         firebase.database().ref(window.sessionid+"/"+window.usernum+"/"+window.problem_order+'/structures/').push().set
             timestamp: new Date().toLocaleString()
             weight: structure.lp.obj
@@ -74,19 +92,37 @@ class Versions
                 data = data[0].split(/\>\>/)
                 start = data[0].split(/\,/)
                 end = data[1].split(/\,/)
+                immovable = (parseInt(data[2]) == "true")
                 beamObjs.push
                     size: size.replace /^\s+|\s+$/g, ""
                     start_x: start[0].replace /^\s+|\s+$/g, ""
                     start_y: start[1].replace /^\s+|\s+$/g, ""
+                    start_z: start[2].replace /^\s+|\s+$/g, ""
                     end_x: end[0].replace /^\s+|\s+$/g, ""
                     end_y: end[1].replace /^\s+|\s+$/g, ""
+                    end_z: end[2].replace /^\s+|\s+$/g, ""
+                    immovable: immovable
             nodeObjs = []
             nodes = structure.nodestr.split(/\r?\n/)
             for node in nodes
-                data = node.split(" ")
+                data = node.split(/\|/)
+                coordinatesData = data[0].split(" ")
+                fixedData = data[1].split(" ")
+                forceData = data[2].split(" ")
+                immovableData = (parseInt(data[3]) == "true")
                 nodeObjs.push
-                    x: data[0]
-                    y: data[1]
+                    x: coordinatesData[0]
+                    y: coordinatesData[1]
+                    z: coordinatesData[2]
+                    fixed:
+                        x: fixedData[0]
+                        y: fixedData[1]
+                        z: fixedData[2]
+                    force:
+                        x: forceData[0]
+                        y: forceData[1]
+                        z: forceData[2]
+                    immovable: immovable
             structure.solve()
             firebase.database().ref(window.sessionid+"/"+window.usernum+"/"+window.problem_order+'/events/').push().set
                 type: "save"
@@ -119,6 +155,7 @@ class Versions
     updatePreviewHistory: (structure) ->
         if not structure?
             structure = new tacit.Structure(@project.easel.pad.sketch.structure)
+        @project.easel.pad.sketch.fea()
         previewVersionObj = d3.select("#PreviewHistory").append("div").attr("id", "ver"+window.partnernum+"-"+structure.historyLength).classed("ver", true)
         previewEasel = new dummyEasel(this, structure.historyLength, @project)
         previewVersionObj.append("div").attr("id", "versvg"+window.partnernum+"-"+structure.historyLength).classed("versvg", true)
@@ -130,6 +167,8 @@ class Versions
         previewPad.sketch.showforce = false
         previewPad.sketch.updateDrawing()
         @history.push(previewPad)
+        structure.solve()
+        previewPad.sketch.fea()
 
     save: (structure) ->
         if window.triggers.save?
