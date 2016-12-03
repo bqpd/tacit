@@ -12,6 +12,7 @@ function initialize(structure) {
 		var width = parseInt($(window).width()/2 - offset/2);
 	window.project = {"name": "untitled", "onChange": function(){}};
 	global_weight = document.getElementById("designweight")
+	preview_weight = document.getElementById("PreviewCost")
 	window.project.easel = new tacit.Easel(window.project, "#PadView",
 						    	height, width, structure, global_weight);
 	window.project.actionQueue = [];
@@ -23,7 +24,7 @@ function initialize(structure) {
 	// todo: don't hardcode preview window size
 	window.preview = {"name": "untitled", "onChange": function(){}};
 	window.preview.easel = new tacit.Easel(window.project, "#Preview",
-						    	225, 225, structure, global_weight);
+						    	225, 225, structure, preview_weight);
 	window.preview.easel.mouseMove = function(){return;}
 	window.preview.easel.allowPan = function(){return;}
 
