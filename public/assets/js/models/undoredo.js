@@ -19,7 +19,7 @@
     }
 
     UndoRedo.prototype.log = function() {
-      var beam, beamObjs, beams, clock, data, end, node, nodeObjs, nodes, size, start, structure, tickfn, _i, _j, _len, _len1, _ref1;
+      var beam, beamObjs, beams, clock, coordinatesData, data, end, fixedData, forceData, immovable, node, nodeObjs, nodes, size, start, structure, tickfn, _i, _j, _len, _len1, _ref1;
       this.project.onChange();
       structure = new tacit.Structure(this.project.easel.pad.sketch.structure);
       structure.solve();
@@ -70,6 +70,7 @@
         }
         window.log += ("# at " + (new Date().toLocaleString()) + ", a new structure of weight " + structure.lp.obj + " with " + project.easel.pad.sketch.structure.nodeList.length + " nodes and " + project.easel.pad.sketch.structure.beamList.length + " beams was created by the " + project.easel.currentTool.name + " tool\n") + structure.strucstr + "\n";
         beams = structure.strucstr.split(/\r?\n/);
+        console.log("strucstr = ", structure.strucstr);
         beamObjs = [];
         for (_i = 0, _len = beams.length; _i < _len; _i++) {
           beam = beams[_i];
@@ -78,22 +79,43 @@
           data = data[0].split(/\>\>/);
           start = data[0].split(/\,/);
           end = data[1].split(/\,/);
+          immovable = data[2] === "true";
           beamObjs.push({
             size: size.replace(/^\s+|\s+$/g, ""),
             start_x: start[0].replace(/^\s+|\s+$/g, ""),
             start_y: start[1].replace(/^\s+|\s+$/g, ""),
+            start_z: start[2].replace(/^\s+|\s+$/g, ""),
             end_x: end[0].replace(/^\s+|\s+$/g, ""),
-            end_y: end[1].replace(/^\s+|\s+$/g, "")
+            end_y: end[1].replace(/^\s+|\s+$/g, ""),
+            end_z: end[2].replace(/^\s+|\s+$/g, ""),
+            immovable: immovable
           });
         }
         nodeObjs = [];
         nodes = structure.nodestr.split(/\r?\n/);
+        console.log("nodestr = ", structure.nodestr);
         for (_j = 0, _len1 = nodes.length; _j < _len1; _j++) {
           node = nodes[_j];
-          data = node.split(" ");
+          data = node.split(/\|/);
+          coordinatesData = data[0].split(" ");
+          fixedData = data[1].split(" ");
+          forceData = data[2].split(" ");
+          immovable = data[3] === "true";
           nodeObjs.push({
-            x: data[0],
-            y: data[1]
+            x: coordinatesData[0],
+            y: coordinatesData[1],
+            z: coordinatesData[2],
+            fixed: {
+              x: fixedData[0],
+              y: fixedData[1],
+              z: fixedData[2]
+            },
+            force: {
+              x: forceData[0],
+              y: forceData[1],
+              z: forceData[2]
+            },
+            immovable: immovable
           });
         }
         firebase.database().ref(window.sessionid + "/" + window.usernum + "/" + window.problem_order + '/structures/').push().set({
@@ -112,7 +134,7 @@
     };
 
     UndoRedo.prototype.undo = function() {
-      var beam, beamObjs, beams, data, end, node, nodeObjs, nodes, size, start, structure, _i, _j, _len, _len1;
+      var beam, beamObjs, beams, coordinatesData, data, end, fixedData, forceData, immovable, node, nodeObjs, nodes, size, start, structure, _i, _j, _len, _len1;
       if (this.pointer - 1 >= 0) {
         if (window.triggers.undo != null) {
           window.triggers.undo();
@@ -134,22 +156,42 @@
           data = data[0].split(/\>\>/);
           start = data[0].split(/\,/);
           end = data[1].split(/\,/);
+          immovable = data[2] === "true";
           beamObjs.push({
             size: size.replace(/^\s+|\s+$/g, ""),
             start_x: start[0].replace(/^\s+|\s+$/g, ""),
             start_y: start[1].replace(/^\s+|\s+$/g, ""),
+            start_z: start[2].replace(/^\s+|\s+$/g, ""),
             end_x: end[0].replace(/^\s+|\s+$/g, ""),
-            end_y: end[1].replace(/^\s+|\s+$/g, "")
+            end_y: end[1].replace(/^\s+|\s+$/g, ""),
+            end_z: end[2].replace(/^\s+|\s+$/g, ""),
+            immovable: immovable
           });
         }
         nodeObjs = [];
         nodes = structure.nodestr.split(/\r?\n/);
         for (_j = 0, _len1 = nodes.length; _j < _len1; _j++) {
           node = nodes[_j];
-          data = node.split(" ");
+          data = node.split(/\|/);
+          coordinatesData = data[0].split(" ");
+          fixedData = data[1].split(" ");
+          forceData = data[2].split(" ");
+          immovable = data[3] === "true";
           nodeObjs.push({
-            x: data[0],
-            y: data[1]
+            x: coordinatesData[0],
+            y: coordinatesData[1],
+            z: coordinatesData[2],
+            fixed: {
+              x: fixedData[0],
+              y: fixedData[1],
+              z: fixedData[2]
+            },
+            force: {
+              x: forceData[0],
+              y: forceData[1],
+              z: forceData[2]
+            },
+            immovable: immovable
           });
         }
         return firebase.database().ref(window.sessionid + "/" + window.usernum + "/" + window.problem_order + '/structures/').push().set({
