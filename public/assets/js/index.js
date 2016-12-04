@@ -149,7 +149,6 @@ function initialize(structure) {
 				beam.immovable = beamData.immovable;
                 beams.push(beam);
             }
-<<<<<<< HEAD
             var nodes =[];
             for(var i = 0; i < structureData.nodes; i++) {
                 var nodeData = structureData.nodeList[i];
