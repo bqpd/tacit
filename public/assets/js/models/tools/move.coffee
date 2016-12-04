@@ -16,7 +16,7 @@ moveTool =
 
     mouseDown: (easel, eventType, mouseLoc, object) ->
         if eventType is "node"
-            if not object.immovable?
+            if not (object.immovable? and object.immovable)
                 @selection = object
                 @selectiontype = "node"
                 @allowPan = false

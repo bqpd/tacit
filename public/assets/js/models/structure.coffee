@@ -24,11 +24,10 @@ gen_classes = (nodeLookup, nodeIDLookup, nodeList, beamList, nodes, beams) ->
             # add the node to lookups and the list
             nodeLookup[@z] ?= {}
             nodeLookup[@z][@y] ?= {}
-	    #if nodeLookup[@z][@y][@x]?
-	    #    throw "a node is already there, aborting."
-	    #else
-	    #    nodeLookup[@z][@y][@x] = @id
-            nodeLookup[@z][@y][@x] = @id
+            if nodeLookup[@z][@y][@x]?
+               throw "a node is already there, aborting."
+            else
+               nodeLookup[@z][@y][@x] = @id
             nodeIDLookup[@id] = this
             nodeList.push(this)
         moveto: (pos) ->
