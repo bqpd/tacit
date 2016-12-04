@@ -57,62 +57,48 @@ function initialize(structure) {
 	});
     var updatePreview = function(snapshot, prevChildKey) {
             structure = getStructureFromSnapshot(snapshot.val());
-			console.log("updatePreview structure = ", structure);
 			previewVersions.updatePreview(structure);
-			/*
-            console.log("updatePreview: structure = ", structure);
-            console.log("updatePreview after solve: structure = ", structure);
-            window.preview.easel.pad.load(structure, genhelper=false);
-            window.preview.easel.pad.nodeSize = 0;
-            window.preview.easel.pad.showforce = false;
-            window.preview.easel.pad.sketch.updateDrawing();
-			structure.solve();
-            window.preview.easel.pad.sketch.fea();
-			*/
             return;
     }
     var getStructureFromSnapshot = function(structureData) {
 			structure = new tacit.Structure;
-
 			var nodes =[];
 			for(var i = 0; i < structureData.nodes; i++) {
-					var nodeData = structureData.nodeList[i];
-	console.log("nodeData = ", nodeData);
-					var node = new structure.Node(
-							{
-									x: parseFloat(nodeData.x),
-									y: parseFloat(nodeData.y),
-									z: parseFloat(nodeData.z)
-							}
-					);
-					if ("fixed" in nodeData) {
-							node.fixed = {
-									x: (nodeData.fixed.x === "true"),
-									y: (nodeData.fixed.y === "true"),
-									z: (nodeData.fixed.z === "true")
-							};
-					} else {
-							node.fixed = {
-									x: true,
-									y: true,
-									z: true
-							};
-					}
-					if ("force" in nodeData) {
-							node.force = {
-									x: parseFloat(nodeData.force.x),
-									y: parseFloat(nodeData.force.y),
-									z: parseFloat(nodeData.force.z)
-							};
-					} else {
-							node.force = {
-									x: 0,
-									y: 0,
-									z: 0
-							};
-					}
-	node.immovable = nodeData.immovable;
-					nodes.push(node);
+				var nodeData = structureData.nodeList[i];
+				console.log("nodeData = ", nodeData);
+				var node = new structure.Node({
+					x: parseFloat(nodeData.x),
+					y: parseFloat(nodeData.y),
+					z: parseFloat(nodeData.z)
+				});
+				if ("fixed" in nodeData) {
+					node.fixed = {
+						x: (nodeData.fixed.x === "true"),
+						y: (nodeData.fixed.y === "true"),
+						z: (nodeData.fixed.z === "true")
+					};
+				} else {
+					node.fixed = {
+						x: true,
+						y: true,
+						z: true
+					};
+				}
+				if ("force" in nodeData) {
+					node.force = {
+						x: parseFloat(nodeData.force.x),
+						y: parseFloat(nodeData.force.y),
+						z: parseFloat(nodeData.force.z)
+					};
+				} else {
+					node.force = {
+						x: 0,
+						y: 0,
+						z: 0
+					};
+				}
+				node.immovable = nodeData.immovable;
+				nodes.push(node);
 			}
 			// todo: don't hardcode starting nodes
 			if (nodes.length == 0) {
@@ -124,10 +110,10 @@ function initialize(structure) {
 					n3.immovable = true;
 					n4 = new structure.Node({x: 60, y: 1.65, z: 0});
 					n4.immovable = true;
-	nodes.push(n1);
-	nodes.push(n2);
-	nodes.push(n3);
-	nodes.push(n4);
+					nodes.push(n1);
+					nodes.push(n2);
+					nodes.push(n3);
+					nodes.push(n4);
 			}
             var beams = [];
             for(var i = 0; i < structureData.beams; i++) {
@@ -148,61 +134,6 @@ function initialize(structure) {
                 );
 				beam.immovable = beamData.immovable;
                 beams.push(beam);
-            }
-            var nodes =[];
-            for(var i = 0; i < structureData.nodes; i++) {
-                var nodeData = structureData.nodeList[i];
-				console.log("nodeData = ", nodeData);
-                var node = new tacit.Node(
-                    {
-                        x: parseFloat(nodeData.x),
-                        y: parseFloat(nodeData.y),
-                        z: parseFloat(nodeData.z)
-                    }
-                );
-                if ("fixed" in nodeData) {
-                    node.fixed = {
-                        x: (nodeData.fixed.x === "true"),
-                        y: (nodeData.fixed.y === "true"),
-                        z: (nodeData.fixed.z === "true")
-                    };
-                } else {
-                    node.fixed = {
-                        x: true,
-                        y: true,
-                        z: true
-                    };
-                }
-                if ("force" in nodeData) {
-                    node.force = {
-                        x: parseFloat(nodeData.force.x),
-                        y: parseFloat(nodeData.force.y),
-                        z: parseFloat(nodeData.force.z)
-                    };
-                } else {
-                    node.force = {
-                        x: 0,
-                        y: 0,
-                        z: 0
-                    };
-                }
-				node.immovable = nodeData.immovable;
-                nodes.push(node);
-            }
-            // todo: don't hardcode starting nodes
-            if (nodes.length == 0) {
-                n1 = new tacit.Node({x: 42, y: 72, z: 0});
-                n1.immovable = true;
-                n2 = new tacit.Node({x: 42, y: 97, z: 0});
-                n2.immovable = true;
-                n3 = new tacit.Node({x: 20, y: 1.65, z: 0});
-                n3.immovable = true;
-                n4 = new tacit.Node({x: 60, y: 1.65, z: 0});
-                n4.immovable = true;
-				nodes.push(n1);
-				nodes.push(n2);
-				nodes.push(n3);
-				nodes.push(n4);
             }
             structure = new tacit.Structure(null);
             structure.beamList = beams;
