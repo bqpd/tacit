@@ -48,7 +48,7 @@
     mouseDown: function(easel, eventType, mouseLoc, object) {
       var idx;
       if (eventType === "node") {
-        if (!(object.immovable != null)) {
+        if (!((object.immovable != null) && object.immovable)) {
           this.selection = object;
           this.selectiontype = "node";
           this.allowPan = false;

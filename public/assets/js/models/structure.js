@@ -89,7 +89,11 @@
         if ((_ref3 = (_base = nodeLookup[this.z])[_name1 = this.y]) == null) {
           _base[_name1] = {};
         }
-        nodeLookup[this.z][this.y][this.x] = this.id;
+        if (nodeLookup[this.z][this.y][this.x] != null) {
+          throw "a node is already there, aborting.";
+        } else {
+          nodeLookup[this.z][this.y][this.x] = this.id;
+        }
         nodeIDLookup[this.id] = this;
         nodeList.push(this);
       }
