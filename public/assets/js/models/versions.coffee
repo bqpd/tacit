@@ -18,6 +18,16 @@ class dummyEasel
         @versions.project.easel.pad.sketch.fea()
         @versions.project.onChange()
         window.log += "# at #{new Date().toLocaleString()}, a new structure of weight #{structure.lp.obj} with #{project.easel.pad.sketch.structure.nodeList.length} nodes and #{project.easel.pad.sketch.structure.beamList.length} beams was created by the load tool\n" + structure.strucstr + "\n"
+        if structure.last_edit == window.usernum
+            saveToDatabase(structure, "load from self")
+        else
+            saveToDatabase(structure, "load from teammate")
+        return false
+
+    allowPan: -> false
+    mouseUp: (easel, eventType, mouseLoc, object) -> false
+    mouseMove: (easel, eventType, mouseLoc, object) -> false
+    saveToDatabase: (structure, tool) ->
         beams = structure.strucstr.split(/\r?\n/)
         beamObjs = []
         for beam in beams
@@ -57,29 +67,14 @@ class dummyEasel
                     y: forceData[1]
                     z: forceData[2]
                 immovable: immovable
-        if structure.last_edit == window.usernum
             firebase.database().ref(window.sessionid+"/"+window.usernum+"/"+window.problem_order+'/structures/').push().set
                 timestamp: new Date().toLocaleString()
                 weight: structure.lp.obj
                 nodes: project.easel.pad.sketch.structure.nodeList.length
                 beams: project.easel.pad.sketch.structure.beamList.length
-                tool: "load from self"
+                tool: tool
                 beamList: beamObjs
                 nodeList: nodeObjs
-        else
-            firebase.database().ref(window.sessionid+"/"+window.usernum+"/"+window.problem_order+'/structures/').push().set
-                timestamp: new Date().toLocaleString()
-                weight: structure.lp.obj
-                nodes: project.easel.pad.sketch.structure.nodeList.length
-                beams: project.easel.pad.sketch.structure.beamList.length
-                tool: "load from teammate"
-                beamList: beamObjs
-                nodeList: nodeObjs
-        return false
-
-    allowPan: -> false
-    mouseUp: (easel, eventType, mouseLoc, object) -> false
-    mouseMove: (easel, eventType, mouseLoc, object) -> false
 
 class Versions
     constructor: (@project, newVersion) ->
