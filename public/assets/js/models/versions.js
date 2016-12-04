@@ -25,6 +25,7 @@
       this.project.actionQueue = [structure];
       undoredo.pointer = 0;
       structure = new tacit.Structure(structure);
+      structure.last_edit = this.versions.history[this.i].sketch.structure.last_edit;
       this.versions.project.easel.pad.load(structure);
       this.versions.project.easel.pad.sketch.feapad = window.feapadpad;
       this.versions.project.easel.pad.sketch.updateDrawing();
@@ -78,15 +79,27 @@
           immovable: immovable
         });
       }
-      firebase.database().ref(window.sessionid + "/" + window.usernum + "/" + window.problem_order + '/structures/').push().set({
-        timestamp: new Date().toLocaleString(),
-        weight: structure.lp.obj,
-        nodes: project.easel.pad.sketch.structure.nodeList.length,
-        beams: project.easel.pad.sketch.structure.beamList.length,
-        tool: "load",
-        beamList: beamObjs,
-        nodeList: nodeObjs
-      });
+      if (structure.last_edit === window.usernum) {
+        firebase.database().ref(window.sessionid + "/" + window.usernum + "/" + window.problem_order + '/structures/').push().set({
+          timestamp: new Date().toLocaleString(),
+          weight: structure.lp.obj,
+          nodes: project.easel.pad.sketch.structure.nodeList.length,
+          beams: project.easel.pad.sketch.structure.beamList.length,
+          tool: "load from self",
+          beamList: beamObjs,
+          nodeList: nodeObjs
+        });
+      } else {
+        firebase.database().ref(window.sessionid + "/" + window.usernum + "/" + window.problem_order + '/structures/').push().set({
+          timestamp: new Date().toLocaleString(),
+          weight: structure.lp.obj,
+          nodes: project.easel.pad.sketch.structure.nodeList.length,
+          beams: project.easel.pad.sketch.structure.beamList.length,
+          tool: "load from teammate",
+          beamList: beamObjs,
+          nodeList: nodeObjs
+        });
+      }
       return false;
     };
 
@@ -175,6 +188,7 @@
           });
         }
         structure.solve();
+        structure.last_edit = window.usernum;
         firebase.database().ref(window.sessionid + "/" + window.usernum + "/" + window.problem_order + '/events/').push().set({
           type: "save",
           timestamp: new Date().toLocaleString(),
@@ -183,7 +197,8 @@
           nodeList: nodeObjs,
           beamList: beamObjs,
           historyLength: this.history.length,
-          weight: structure.lp.obj
+          weight: structure.lp.obj,
+          last_edit: window.usernum
         });
         versionObj = d3.select(this.htmlLoc).append("div").attr("id", "ver" + window.usernum + "-" + this.history.length).classed("ver", true);
         easel = new dummyEasel(this, this.history.length, this.project);
