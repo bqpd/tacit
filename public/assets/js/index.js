@@ -64,7 +64,6 @@ function initialize(structure) {
 			var nodes =[];
 			for(var i = 0; i < structureData.nodes; i++) {
 					var nodeData = structureData.nodeList[i];
-	console.log("nodeData = ", nodeData);
 					var node = new structure.Node(
 							{
 									x: parseFloat(nodeData.x),
@@ -119,7 +118,6 @@ function initialize(structure) {
             var beams = [];
             for(var i = 0; i < structureData.beams; i++) {
 			    var beamData = structureData.beamList[i];
-				console.log("beamData = ", beamData);
                 var beam = new structure.Beam(
                     {
 						x: parseFloat(beamData.start_x),
