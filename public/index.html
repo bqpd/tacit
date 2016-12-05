@@ -156,8 +156,6 @@
 
     if window.tutorial
         window.tutorialidx = 0
-        if location.hash.search("_") < 6
-            window.tutorialidx = 9
         window.nextTutorialStep = ->
             window.tutorialidx++
             if window.tutorialidx <= window.tutorialsteps.length
