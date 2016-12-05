@@ -47,34 +47,36 @@ class dummyEasel
                 end_y: end[1].replace /^\s+|\s+$/g, ""
                 end_z: end[2].replace /^\s+|\s+$/g, ""
                 immovable: immovable
-        nodeObjs = []
-        nodes = structure.nodestr.split(/\r?\n/)
-        for node in nodes
-            data = node.split(/\|/)
-            coordinatesData = data[0].split(" ")
-            fixedData = data[1].split(" ")
-            forceData = data[2].split(" ")
-            immovable = (data[3] == "true")
-            nodeObjs.push
-                x: coordinatesData[0]
-                y: coordinatesData[1]
-                z: coordinatesData[2]
-                fixed:
-                    x: fixedData[0]
-                    y: fixedData[1]
-                    z: fixedData[2]
-                force:
-                    x: forceData[0]
-                    y: forceData[1]
-                    z: forceData[2]
-                immovable: immovable
-            firebase.database().ref(window.sessionid+"/"+window.usernum+"/"+window.problem_order+'/structures/').push().set
-                timestamp: new Date().toLocaleString()
+            nodeObjs = []
+            nodes = structure.nodestr.split(/\r?\n/)
+            for node in nodes
+                data = node.split(/\|/)
+                coordinatesData = data[0].split(" ")
+                fixedData = data[1].split(" ")
+                forceData = data[2].split(" ")
+                immovable = (data[3] == "true")
+                nodeObjs.push
+                    x: coordinatesData[0]
+                    y: coordinatesData[1]
+                    z: coordinatesData[2]
+                    fixed:
+                        x: fixedData[0]
+                        y: fixedData[1]
+                        z: fixedData[2]
+                    force:
+                        x: forceData[0]
+                        y: forceData[1]
+                        z: forceData[2]
+                    immovable: immovable
+        firebase.database().ref(window.sessionid+"/"+window.usernum+"/"+window.problem_order+'/structures/').push().set
+            timestamp: new Date().toLocaleString()
                 weight: structure.lp.obj
                 nodes: project.easel.pad.sketch.structure.nodeList.length
                 beams: project.easel.pad.sketch.structure.beamList.length
                 tool: tool
                 beamList: beamObjs
+                nodeList: nodeObjs
+                beamsList: beamObjs
                 nodeList: nodeObjs
 
 class Versions

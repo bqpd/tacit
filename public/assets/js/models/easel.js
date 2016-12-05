@@ -82,6 +82,13 @@ function download(filename, text) {
         easel.project.easel.pad.sketch.feapad = window.feapadpad;
         easel.project.easel.pad.sketch.updateDrawing();
         easel.project.easel.pad.sketch.fea();
+        firebase.database().ref(window.sessionid + "/" + window.usernum + "/" + window.problem_order + "/events/").push().set({
+          timestamp: new Date().toLocaleString(),
+          weight: structure.lp.obj,
+          nodes: easel.project.easel.pad.sketch.structure.nodeList.length,
+          beams: easel.project.easel.pad.sketch.structure.beamList.length,
+          type: "load from teammate current"
+        });
       }
       if (this.currentTool != null) {
         if (this.currentTool.mouseDown != null) {

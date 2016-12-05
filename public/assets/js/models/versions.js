@@ -53,7 +53,7 @@
     };
 
     dummyEasel.prototype.saveToDatabase = function(structure, tool) {
-      var beam, beamObjs, beams, coordinatesData, data, end, fixedData, forceData, immovable, node, nodeObjs, nodes, size, start, _i, _j, _len, _len1, _results;
+      var beam, beamObjs, beams, coordinatesData, data, end, fixedData, forceData, immovable, node, nodeObjs, nodes, size, start, _i, _j, _len, _len1;
       beams = structure.strucstr.split(/\r?\n/);
       beamObjs = [];
       for (_i = 0, _len = beams.length; _i < _len; _i++) {
@@ -74,44 +74,45 @@
           end_z: end[2].replace(/^\s+|\s+$/g, ""),
           immovable: immovable
         });
+        nodeObjs = [];
+        nodes = structure.nodestr.split(/\r?\n/);
+        for (_j = 0, _len1 = nodes.length; _j < _len1; _j++) {
+          node = nodes[_j];
+          data = node.split(/\|/);
+          coordinatesData = data[0].split(" ");
+          fixedData = data[1].split(" ");
+          forceData = data[2].split(" ");
+          immovable = data[3] === "true";
+          nodeObjs.push({
+            x: coordinatesData[0],
+            y: coordinatesData[1],
+            z: coordinatesData[2],
+            fixed: {
+              x: fixedData[0],
+              y: fixedData[1],
+              z: fixedData[2]
+            },
+            force: {
+              x: forceData[0],
+              y: forceData[1],
+              z: forceData[2]
+            },
+            immovable: immovable
+          });
+        }
       }
-      nodeObjs = [];
-      nodes = structure.nodestr.split(/\r?\n/);
-      _results = [];
-      for (_j = 0, _len1 = nodes.length; _j < _len1; _j++) {
-        node = nodes[_j];
-        data = node.split(/\|/);
-        coordinatesData = data[0].split(" ");
-        fixedData = data[1].split(" ");
-        forceData = data[2].split(" ");
-        immovable = data[3] === "true";
-        nodeObjs.push({
-          x: coordinatesData[0],
-          y: coordinatesData[1],
-          z: coordinatesData[2],
-          fixed: {
-            x: fixedData[0],
-            y: fixedData[1],
-            z: fixedData[2]
-          },
-          force: {
-            x: forceData[0],
-            y: forceData[1],
-            z: forceData[2]
-          },
-          immovable: immovable
-        });
-        _results.push(firebase.database().ref(window.sessionid + "/" + window.usernum + "/" + window.problem_order + '/structures/').push().set({
-          timestamp: new Date().toLocaleString(),
+      return firebase.database().ref(window.sessionid + "/" + window.usernum + "/" + window.problem_order + '/structures/').push().set({
+        timestamp: new Date().toLocaleString()({
           weight: structure.lp.obj,
           nodes: project.easel.pad.sketch.structure.nodeList.length,
           beams: project.easel.pad.sketch.structure.beamList.length,
           tool: tool,
           beamList: beamObjs,
+          nodeList: nodeObjs,
+          beamsList: beamObjs,
           nodeList: nodeObjs
-        }));
-      }
-      return _results;
+        })
+      });
     };
 
     return dummyEasel;
