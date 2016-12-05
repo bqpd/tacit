@@ -19,7 +19,7 @@
     }
 
     UndoRedo.prototype.log = function() {
-      var beam, beamObjs, beams, clock, coordinatesData, data, end, fixedData, forceData, immovable, node, nodeObjs, nodes, size, start, structure, tickfn, _i, _j, _len, _len1, _ref1;
+      var clock, structure, tickfn, _ref1;
       this.project.onChange();
       structure = new tacit.Structure(this.project.easel.pad.sketch.structure);
       structure.solve();
@@ -69,62 +69,7 @@
           window.log = "";
         }
         window.log += ("# at " + (new Date().toLocaleString()) + ", a new structure of weight " + structure.lp.obj + " with " + project.easel.pad.sketch.structure.nodeList.length + " nodes and " + project.easel.pad.sketch.structure.beamList.length + " beams was created by the " + project.easel.currentTool.name + " tool\n") + structure.strucstr + "\n";
-        beams = structure.strucstr.split(/\r?\n/);
-        beamObjs = [];
-        for (_i = 0, _len = beams.length; _i < _len; _i++) {
-          beam = beams[_i];
-          data = beam.split(/\|/);
-          size = data[1];
-          data = data[0].split(/\>\>/);
-          start = data[0].split(/\,/);
-          end = data[1].split(/\,/);
-          immovable = data[2] === "true";
-          beamObjs.push({
-            size: size.replace(/^\s+|\s+$/g, ""),
-            start_x: start[0].replace(/^\s+|\s+$/g, ""),
-            start_y: start[1].replace(/^\s+|\s+$/g, ""),
-            start_z: start[2].replace(/^\s+|\s+$/g, ""),
-            end_x: end[0].replace(/^\s+|\s+$/g, ""),
-            end_y: end[1].replace(/^\s+|\s+$/g, ""),
-            end_z: end[2].replace(/^\s+|\s+$/g, ""),
-            immovable: immovable
-          });
-        }
-        nodeObjs = [];
-        nodes = structure.nodestr.split(/\r?\n/);
-        for (_j = 0, _len1 = nodes.length; _j < _len1; _j++) {
-          node = nodes[_j];
-          data = node.split(/\|/);
-          coordinatesData = data[0].split(" ");
-          fixedData = data[1].split(" ");
-          forceData = data[2].split(" ");
-          immovable = data[3] === "true";
-          nodeObjs.push({
-            x: coordinatesData[0],
-            y: coordinatesData[1],
-            z: coordinatesData[2],
-            fixed: {
-              x: fixedData[0],
-              y: fixedData[1],
-              z: fixedData[2]
-            },
-            force: {
-              x: forceData[0],
-              y: forceData[1],
-              z: forceData[2]
-            },
-            immovable: immovable
-          });
-        }
-        firebase.database().ref(window.sessionid + "/" + window.usernum + "/" + window.problem_order + '/structures/').push().set({
-          timestamp: new Date().toLocaleString(),
-          weight: structure.lp.obj,
-          nodes: project.easel.pad.sketch.structure.nodeList.length,
-          beams: project.easel.pad.sketch.structure.beamList.length,
-          tool: project.easel.currentTool.name,
-          beamList: beamObjs,
-          nodeList: nodeObjs
-        });
+        this.saveToDatabase(structure, project.easel.currentTool.name);
         this.project.actionQueue = this.project.actionQueue.slice(0, this.pointer + 1);
         this.project.actionQueue.push(structure);
         return this.pointer = this.project.actionQueue.length - 1;
@@ -132,7 +77,7 @@
     };
 
     UndoRedo.prototype.undo = function() {
-      var beam, beamObjs, beams, coordinatesData, data, end, fixedData, forceData, immovable, node, nodeObjs, nodes, size, start, structure, _i, _j, _len, _len1;
+      var structure;
       if (this.pointer - 1 >= 0) {
         if (window.triggers.undo != null) {
           window.triggers.undo();
@@ -145,130 +90,81 @@
         this.project.easel.pad.sketch.dragline.attr("x1", 0).attr("x2", 0).attr("y1", 0).attr("y2", 0);
         this.project.easel.currentTool.drawStart = false;
         window.log += ("# at " + (new Date().toLocaleString()) + ", a new structure of weight " + structure.lp.obj + " with " + project.easel.pad.sketch.structure.nodeList.length + " nodes and " + project.easel.pad.sketch.structure.beamList.length + " beams was created by the undo tool\n") + structure.strucstr + "\n";
-        beams = structure.strucstr.split(/\r?\n/);
-        beamObjs = [];
-        for (_i = 0, _len = beams.length; _i < _len; _i++) {
-          beam = beams[_i];
-          data = beam.split(/\|/);
-          size = data[1];
-          data = data[0].split(/\>\>/);
-          start = data[0].split(/\,/);
-          end = data[1].split(/\,/);
-          immovable = data[2] === "true";
-          beamObjs.push({
-            size: size.replace(/^\s+|\s+$/g, ""),
-            start_x: start[0].replace(/^\s+|\s+$/g, ""),
-            start_y: start[1].replace(/^\s+|\s+$/g, ""),
-            start_z: start[2].replace(/^\s+|\s+$/g, ""),
-            end_x: end[0].replace(/^\s+|\s+$/g, ""),
-            end_y: end[1].replace(/^\s+|\s+$/g, ""),
-            end_z: end[2].replace(/^\s+|\s+$/g, ""),
-            immovable: immovable
-          });
-        }
-        nodeObjs = [];
-        nodes = structure.nodestr.split(/\r?\n/);
-        for (_j = 0, _len1 = nodes.length; _j < _len1; _j++) {
-          node = nodes[_j];
-          data = node.split(/\|/);
-          coordinatesData = data[0].split(" ");
-          fixedData = data[1].split(" ");
-          forceData = data[2].split(" ");
-          immovable = data[3] === "true";
-          nodeObjs.push({
-            x: coordinatesData[0],
-            y: coordinatesData[1],
-            z: coordinatesData[2],
-            fixed: {
-              x: fixedData[0],
-              y: fixedData[1],
-              z: fixedData[2]
-            },
-            force: {
-              x: forceData[0],
-              y: forceData[1],
-              z: forceData[2]
-            },
-            immovable: immovable
-          });
-        }
-        return firebase.database().ref(window.sessionid + "/" + window.usernum + "/" + window.problem_order + '/structures/').push().set({
-          timestamp: new Date().toLocaleString(),
-          weight: structure.lp.obj,
-          nodes: project.easel.pad.sketch.structure.nodeList.length,
-          beams: project.easel.pad.sketch.structure.beamList.length,
-          tool: "undo",
-          beamList: beamObjs,
-          nodeList: nodeObjs
-        });
+        return this.saveToDatabase(structure, "undo");
       }
     };
 
     UndoRedo.prototype.redo = function() {
-      var beam, beamObjs, beams, coordinatesData, data, end, fixedData, forceData, immovable, node, nodeObjs, nodes, size, start, _i, _j, _len, _len1;
+      var structure;
       if (this.pointer + 1 < this.project.actionQueue.length) {
         this.pointer += 1;
         this.project.easel.pad.load(this.project.actionQueue[this.pointer]);
         this.project.easel.pad.sketch.feapad = window.feapadpad;
         this.project.easel.pad.sketch.updateDrawing();
+        structure = project.easel.pad.sketch.structure;
         window.log += ("# at " + (new Date().toLocaleString()) + ", a new structure of weight " + structure.lp.obj + " with " + project.easel.pad.sketch.structure.nodeList.length + " nodes and " + project.easel.pad.sketch.structure.beamList.length + " beams was created by the redo tool\n") + structure.strucstr + "\n";
-        beams = structure.strucstr.split(/\r?\n/);
-        beamObjs = [];
-        for (_i = 0, _len = beams.length; _i < _len; _i++) {
-          beam = beams[_i];
-          data = beam.split(/\|/);
-          size = data[1];
-          data = data[0].split(/\>\>/);
-          start = data[0].split(/\,/);
-          end = data[1].split(/\,/);
-          immovable = data[2] === "true";
-          beamObjs.push({
-            size: size.replace(/^\s+|\s+$/g, ""),
-            start_x: start[0].replace(/^\s+|\s+$/g, ""),
-            start_y: start[1].replace(/^\s+|\s+$/g, ""),
-            start_z: start[2].replace(/^\s+|\s+$/g, ""),
-            end_x: end[0].replace(/^\s+|\s+$/g, ""),
-            end_y: end[1].replace(/^\s+|\s+$/g, ""),
-            end_z: end[2].replace(/^\s+|\s+$/g, ""),
-            immovable: immovable
-          });
-        }
-        nodeObjs = [];
-        nodes = structure.nodestr.split(/\r?\n/);
-        for (_j = 0, _len1 = nodes.length; _j < _len1; _j++) {
-          node = nodes[_j];
-          data = node.split(/\|/);
-          coordinatesData = data[0].split(" ");
-          fixedData = data[1].split(" ");
-          forceData = data[2].split(" ");
-          immovable = data[3] === "true";
-          nodeObjs.push({
-            x: coorindatesData[0],
-            y: coorindatesData[1],
-            z: coorindatesData[2],
-            fixed: {
-              x: fixedData[0],
-              y: fixedData[1],
-              z: fixedData[2]
-            },
-            force: {
-              x: forceData[0],
-              y: forceData[1],
-              z: forceData[2]
-            },
-            immovable: immovable
-          });
-        }
-        return firebase.database().ref(window.sessionid + "/" + window.usernum + "/" + window.problem_order + '/structures/').push().set({
-          timestamp: new Date().toLocaleString(),
-          weight: structure.lp.obj,
-          nodes: project.easel.pad.sketch.structure.nodeList.length,
-          beams: project.easel.pad.sketch.structure.beamList.length,
-          tool: "redo",
-          beamList: beamObjs,
-          nodeList: nodeObjs
+        return this.saveToDatabase(structure, "redo");
+      }
+    };
+
+    UndoRedo.prototype.saveToDatabase = function(structure, tool) {
+      var beam, beamObjs, beams, coordinatesData, data, end, fixedData, forceData, immovable, node, nodeObjs, nodes, size, start, _i, _j, _len, _len1;
+      beams = structure.strucstr.split(/\r?\n/);
+      beamObjs = [];
+      for (_i = 0, _len = beams.length; _i < _len; _i++) {
+        beam = beams[_i];
+        data = beam.split(/\|/);
+        size = data[1];
+        data = data[0].split(/\>\>/);
+        start = data[0].split(/\,/);
+        end = data[1].split(/\,/);
+        immovable = data[2] === "true";
+        beamObjs.push({
+          size: size.replace(/^\s+|\s+$/g, ""),
+          start_x: start[0].replace(/^\s+|\s+$/g, ""),
+          start_y: start[1].replace(/^\s+|\s+$/g, ""),
+          start_z: start[2].replace(/^\s+|\s+$/g, ""),
+          end_x: end[0].replace(/^\s+|\s+$/g, ""),
+          end_y: end[1].replace(/^\s+|\s+$/g, ""),
+          end_z: end[2].replace(/^\s+|\s+$/g, ""),
+          immovable: immovable
         });
       }
+      nodeObjs = [];
+      nodes = structure.nodestr.split(/\r?\n/);
+      for (_j = 0, _len1 = nodes.length; _j < _len1; _j++) {
+        node = nodes[_j];
+        data = node.split(/\|/);
+        coordinatesData = data[0].split(" ");
+        fixedData = data[1].split(" ");
+        forceData = data[2].split(" ");
+        immovable = data[3] === "true";
+        nodeObjs.push({
+          x: coordinatesData[0],
+          y: coordinatesData[1],
+          z: coordinatesData[2],
+          fixed: {
+            x: fixedData[0],
+            y: fixedData[1],
+            z: fixedData[2]
+          },
+          force: {
+            x: forceData[0],
+            y: forceData[1],
+            z: forceData[2]
+          },
+          immovable: immovable
+        });
+      }
+      return firebase.database().ref(window.sessionid + "/" + window.usernum + "/" + window.problem_order + '/structures/').push().set({
+        timestamp: new Date().toLocaleString(),
+        weight: structure.lp.obj,
+        nodes: project.easel.pad.sketch.structure.nodeList.length,
+        beams: project.easel.pad.sketch.structure.beamList.length,
+        tool: tool,
+        beamList: beamObjs,
+        nodeList: nodeObjs
+      });
     };
 
     return UndoRedo;
