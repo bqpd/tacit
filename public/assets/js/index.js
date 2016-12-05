@@ -1,6 +1,6 @@
 function initialize(structure) {
 	window.tutorial_state = -1
-	surveylink = "http://mit.co1.qualtrics.com/SE/?SID=SV_2c6MrrOdYSZiIw5"
+	surveylink = "http://mit.co1.qualtrics.com/SE/?SID=SV_410dgzezR1aoJCt"
 
 	// initialize easel and stuff
 	var height = parseInt($(window).height() - 110);
