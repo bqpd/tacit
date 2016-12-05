@@ -58,6 +58,31 @@ function download(filename, text) {
     };
 
     Easel.prototype.mouseDown = function(easel, eventType, mouseLoc, object) {
+      var latest_snapshot_0, latest_snapshot_1, structure;
+      if (easel.pad.htmlLoc === "#Preview") {
+        structure = null;
+        if (window.usernum === 0) {
+          latest_snapshot_1 = window.getLatestSnapshot1();
+          console.log("click: window.latest_snapshot_1 = ", latest_snapshot_1);
+          structure = window.getStructureFromSnapshot(latest_snapshot_1);
+        } else {
+          latest_snapshot_0 = window.getLatestSnapshot0();
+          console.log("click: window.latest_snapshot_0 = ", latest_snapshot_0);
+          structure = window.getStructureFromSnapshot(latest_snapshot_0);
+        }
+        structure.solve();
+        console.log("structure = ", structure);
+        this.project.actionQueue = [structure];
+        undoredo.pointer = 0;
+        structure = new tacit.Structure(structure);
+        console.log("2 structure = ", structure);
+        structure.last_edit = (window.usernum + 1) % 2;
+        console.log("easel = ", easel);
+        easel.project.easel.pad.load(structure);
+        easel.project.easel.pad.sketch.feapad = window.feapadpad;
+        easel.project.easel.pad.sketch.updateDrawing();
+        easel.project.easel.pad.sketch.fea();
+      }
       if (this.currentTool != null) {
         if (this.currentTool.mouseDown != null) {
           this.currentTool.mouseDown(easel, eventType, mouseLoc, object);

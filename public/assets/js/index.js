@@ -29,12 +29,14 @@ function initialize(structure) {
 	window.preview.easel.allowPan = function(){return;}
 
 	window.db.structures_ref0.on('child_added', function(snapshot, prevChildKey) {
-	    if (window.usernum == 1) {
+			latest_snapshot_0 = snapshot.val();
+	    	if (window.usernum == 1) {
                 updatePreview(snapshot, prevChildKey);
             }
 	});
 
 	window.db.structures_ref1.on('child_added', function(snapshot, prevChildKey) {
+			latest_snapshot_1 = snapshot.val();
             if (window.usernum == 0) {
                 updatePreview(snapshot, prevChildKey);
             }
@@ -42,102 +44,21 @@ function initialize(structure) {
 	var previewVersions = new tacit.Versions(window.project, false);
 	window.db.events_ref0.on('child_added', function(snapshot, prevChildKey) {
             if(window.usernum == 1 && snapshot.val().type == "save") {
-                structure = getStructureFromSnapshot(snapshot.val());
+                structure = window.getStructureFromSnapshot(snapshot.val());
                 previewVersions.updatePreviewHistory(structure);
             }
 	});
 	window.db.events_ref1.on('child_added', function(snapshot, prevChildKey) {
             if(window.usernum == 0 && snapshot.val().type == "save") {
-                structure = getStructureFromSnapshot(snapshot.val());
+                structure = window.getStructureFromSnapshot(snapshot.val());
                 previewVersions.updatePreviewHistory(structure);
             }
 	});
     var updatePreview = function(snapshot, prevChildKey) {
-            structure = getStructureFromSnapshot(snapshot.val());
+            structure = window.getStructureFromSnapshot(snapshot.val());
             window.preview.easel.pad.load(structure);
             window.preview.easel.pad.sketch.updateDrawing();
             return;
-    }
-    var getStructureFromSnapshot = function(structureData) {
-			structure = new tacit.Structure;
-
-			var nodes =[];
-			for(var i = 0; i < structureData.nodes; i++) {
-					var nodeData = structureData.nodeList[i];
-					var node = new structure.Node(
-							{
-									x: parseFloat(nodeData.x),
-									y: parseFloat(nodeData.y),
-									z: parseFloat(nodeData.z)
-							}
-					);
-					if ("fixed" in nodeData) {
-							node.fixed = {
-									x: (nodeData.fixed.x === "true"),
-									y: (nodeData.fixed.y === "true"),
-									z: (nodeData.fixed.z === "true")
-							};
-					} else {
-							node.fixed = {
-									x: true,
-									y: true,
-									z: true
-							};
-					}
-					if ("force" in nodeData) {
-							node.force = {
-									x: parseFloat(nodeData.force.x),
-									y: parseFloat(nodeData.force.y),
-									z: parseFloat(nodeData.force.z)
-							};
-					} else {
-							node.force = {
-									x: 0,
-									y: 0,
-									z: 0
-							};
-					}
-	node.immovable = nodeData.immovable;
-					nodes.push(node);
-			}
-			// todo: don't hardcode starting nodes
-			if (nodes.length == 0) {
-					n1 = new structure.Node({x: 42, y: 72, z: 0});
-					n1.immovable = true;
-					n2 = new structure.Node({x: 42, y: 97, z: 0});
-					n2.immovable = true;
-					n3 = new structure.Node({x: 20, y: 1.65, z: 0});
-					n3.immovable = true;
-					n4 = new structure.Node({x: 60, y: 1.65, z: 0});
-					n4.immovable = true;
-	nodes.push(n1);
-	nodes.push(n2);
-	nodes.push(n3);
-	nodes.push(n4);
-			}
-            var beams = [];
-            for(var i = 0; i < structureData.beams; i++) {
-			    var beamData = structureData.beamList[i];
-                var beam = new structure.Beam(
-                    {
-						x: parseFloat(beamData.start_x),
-						y: parseFloat(beamData.start_y),
-						z: parseFloat(beamData.start_z)
-					},
-                    {
-						x: parseFloat(beamData.end_x),
-						y: parseFloat(beamData.end_y),
-						z: parseFloat(beamData.end_z)
-					},
-                    parseFloat(beamData.size)
-                );
-				beam.immovable = beamData.immovable;
-                beams.push(beam);
-            }
-
-            structure.historyLength = structureData.historyLength;
-            structure.lp = {obj: structureData.weight};
-            return structure;
     }
   	// activate tooltips
 	$('[data-toggle="tooltip"]').tooltip()
@@ -282,6 +203,93 @@ function initialize(structure) {
 	undoredo = new tacit.UndoRedo(window.project)
 
 	$(".notyet").removeClass("notyet")
+}
+
+window.getLatestSnapshot0 = function() {
+	return latest_snapshot_0;
+}
+
+window.getLatestSnapshot1 = function() {
+	return latest_snapshot_1;
+}
+window.getStructureFromSnapshot = function(structureData) {
+	structure = new tacit.Structure;
+
+	var nodes =[];
+	for(var i = 0; i < structureData.nodes; i++) {
+		var nodeData = structureData.nodeList[i];
+		var node = new structure.Node({
+			x: parseFloat(nodeData.x),
+			y: parseFloat(nodeData.y),
+			z: parseFloat(nodeData.z)
+		});
+		if ("fixed" in nodeData) {
+			node.fixed = {
+				x: (nodeData.fixed.x === "true"),
+				y: (nodeData.fixed.y === "true"),
+				z: (nodeData.fixed.z === "true")
+			};
+		} else {
+			node.fixed = {
+				x: true,
+				y: true,
+				z: true
+			};
+		}
+		if ("force" in nodeData) {
+			node.force = {
+				x: parseFloat(nodeData.force.x),
+				y: parseFloat(nodeData.force.y),
+				z: parseFloat(nodeData.force.z)
+			};
+		} else {
+			node.force = {
+				x: 0,
+				y: 0,
+				z: 0
+			};
+		}
+        node.immovable = nodeData.immovable;
+		nodes.push(node);
+	}
+	// todo: don't hardcode starting nodes
+	if (nodes.length == 0) {
+		n1 = new structure.Node({x: 42, y: 72, z: 0});
+		n1.immovable = true;
+		n2 = new structure.Node({x: 42, y: 97, z: 0});
+		n2.immovable = true;
+		n3 = new structure.Node({x: 20, y: 1.65, z: 0});
+		n3.immovable = true;
+		n4 = new structure.Node({x: 60, y: 1.65, z: 0});
+		n4.immovable = true;
+	    nodes.push(n1);
+		nodes.push(n2);
+        nodes.push(n3);
+        nodes.push(n4);
+	}
+    var beams = [];
+    for(var i = 0; i < structureData.beams; i++) {
+	    var beamData = structureData.beamList[i];
+        var beam = new structure.Beam(
+			{
+				x: parseFloat(beamData.start_x),
+				y: parseFloat(beamData.start_y),
+				z: parseFloat(beamData.start_z)
+			},
+    	    {
+				x: parseFloat(beamData.end_x),
+				y: parseFloat(beamData.end_y),
+				z: parseFloat(beamData.end_z)
+			},
+        	parseFloat(beamData.size)
+        );
+		beam.immovable = beamData.immovable;
+        beams.push(beam);
+    }
+
+    structure.historyLength = structureData.historyLength;
+    structure.lp = {obj: structureData.weight};
+    return structure;
 }
 
 window.initialize = initialize;
