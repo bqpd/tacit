@@ -19,14 +19,63 @@ class dummyEasel
         @versions.project.onChange()
         window.log += "# at #{new Date().toLocaleString()}, a new structure of weight #{structure.lp.obj} with #{project.easel.pad.sketch.structure.nodeList.length} nodes and #{project.easel.pad.sketch.structure.beamList.length} beams was created by the load tool\n" + structure.strucstr + "\n"
         if structure.last_edit == window.usernum
-            saveToDatabase(structure, "load from self")
+            this.saveToDatabase(structure, "load from self")
         else
-            saveToDatabase(structure, "load from teammate")
+            this.saveToDatabase(structure, "load from teammate")
         return false
 
     allowPan: -> false
     mouseUp: (easel, eventType, mouseLoc, object) -> false
     mouseMove: (easel, eventType, mouseLoc, object) -> false
+
+    saveToDatabase: (structure, tool) ->
+        beams = structure.strucstr.split(/\r?\n/)
+        beamObjs = []
+        for beam in beams
+            data = beam.split(/\|/)
+            size = data[1]
+            data = data[0].split(/\>\>/)
+            start = data[0].split(/\,/)
+            end = data[1].split(/\,/)
+            immovable = (data[2] == "true")
+            beamObjs.push
+                size: size.replace /^\s+|\s+$/g, ""
+                start_x: start[0].replace /^\s+|\s+$/g, ""
+                start_y: start[1].replace /^\s+|\s+$/g, ""
+                start_z: start[2].replace /^\s+|\s+$/g, ""
+                end_x: end[0].replace /^\s+|\s+$/g, ""
+                end_y: end[1].replace /^\s+|\s+$/g, ""
+                end_z: end[2].replace /^\s+|\s+$/g, ""
+                immovable: immovable
+        nodeObjs = []
+        nodes = structure.nodestr.split(/\r?\n/)
+        for node in nodes
+            data = node.split(/\|/)
+            coordinatesData = data[0].split(" ")
+            fixedData = data[1].split(" ")
+            forceData = data[2].split(" ")
+            immovable = (data[3] == "true")
+            nodeObjs.push
+                x: coordinatesData[0]
+                y: coordinatesData[1]
+                z: coordinatesData[2]
+                fixed:
+                    x: fixedData[0]
+                    y: fixedData[1]
+                    z: fixedData[2]
+                force:
+                    x: forceData[0]
+                    y: forceData[1]
+                    z: forceData[2]
+                immovable: immovable
+            firebase.database().ref(window.sessionid+"/"+window.usernum+"/"+window.problem_order+'/structures/').push().set
+                timestamp: new Date().toLocaleString()
+                weight: structure.lp.obj
+                nodes: project.easel.pad.sketch.structure.nodeList.length
+                beams: project.easel.pad.sketch.structure.beamList.length
+                tool: tool
+                beamList: beamObjs
+                nodeList: nodeObjs
 
 class Versions
     constructor: (@project, newVersion) ->
@@ -135,54 +184,5 @@ class Versions
             window.triggers.save()
         if @project.actionQueue.length > 1 or structure?
             @newVersion(structure, true)
-
-saveToDatabase: (structure, tool) ->
-    beams = structure.strucstr.split(/\r?\n/)
-    beamObjs = []
-    for beam in beams
-        data = beam.split(/\|/)
-        size = data[1]
-        data = data[0].split(/\>\>/)
-        start = data[0].split(/\,/)
-        end = data[1].split(/\,/)
-        immovable = (data[2] == "true")
-        beamObjs.push
-            size: size.replace /^\s+|\s+$/g, ""
-            start_x: start[0].replace /^\s+|\s+$/g, ""
-            start_y: start[1].replace /^\s+|\s+$/g, ""
-            start_z: start[2].replace /^\s+|\s+$/g, ""
-            end_x: end[0].replace /^\s+|\s+$/g, ""
-            end_y: end[1].replace /^\s+|\s+$/g, ""
-            end_z: end[2].replace /^\s+|\s+$/g, ""
-            immovable: immovable
-    nodeObjs = []
-    nodes = structure.nodestr.split(/\r?\n/)
-    for node in nodes
-        data = node.split(/\|/)
-        coordinatesData = data[0].split(" ")
-        fixedData = data[1].split(" ")
-        forceData = data[2].split(" ")
-        immovable = (data[3] == "true")
-        nodeObjs.push
-            x: coordinatesData[0]
-            y: coordinatesData[1]
-            z: coordinatesData[2]
-            fixed:
-                x: fixedData[0]
-                y: fixedData[1]
-                z: fixedData[2]
-            force:
-                x: forceData[0]
-                y: forceData[1]
-                z: forceData[2]
-            immovable: immovable
-        firebase.database().ref(window.sessionid+"/"+window.usernum+"/"+window.problem_order+'/structures/').push().set
-            timestamp: new Date().toLocaleString()
-            weight: structure.lp.obj
-            nodes: project.easel.pad.sketch.structure.nodeList.length
-            beams: project.easel.pad.sketch.structure.beamList.length
-            tool: tool
-            beamList: beamObjs
-            nodeList: nodeObjs
 
 window.tacit.Versions = Versions
