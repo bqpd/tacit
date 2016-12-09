@@ -41,17 +41,17 @@ function initialize(structure) {
                 updatePreview(snapshot, prevChildKey);
             }
 	});
-	var previewVersions = new tacit.Versions(window.project, false);
+	var previewVersions = new tacit.Versions(window.project, null, false);
 	window.db.events_ref0.on('child_added', function(snapshot, prevChildKey) {
             if(window.usernum == 1 && snapshot.val().type == "save") {
                 structure = window.getStructureFromSnapshot(snapshot.val());
-                previewVersions.updatePreviewHistory(structure);
+                previewVersions.updatePreviewHistory(structure, false);
             }
 	});
 	window.db.events_ref1.on('child_added', function(snapshot, prevChildKey) {
             if(window.usernum == 0 && snapshot.val().type == "save") {
                 structure = window.getStructureFromSnapshot(snapshot.val());
-                previewVersions.updatePreviewHistory(structure);
+                previewVersions.updatePreviewHistory(structure, false);
             }
 	});
     var updatePreview = function(snapshot, prevChildKey) {
@@ -199,7 +199,7 @@ function initialize(structure) {
                 });
 		project.easel.pad.sketch.fea()})
 
-	versions = new tacit.Versions(window.project, true);
+	versions = new tacit.Versions(window.project, null, true);
 	undoredo = new tacit.UndoRedo(window.project)
 
 	$(".notyet").removeClass("notyet")

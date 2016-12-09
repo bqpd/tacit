@@ -102,16 +102,15 @@
         }
       }
       return firebase.database().ref(window.sessionid + "/" + window.usernum + "/" + window.problem_order + '/structures/').push().set({
-        timestamp: new Date().toLocaleString()({
-          weight: structure.lp.obj,
-          nodes: project.easel.pad.sketch.structure.nodeList.length,
-          beams: project.easel.pad.sketch.structure.beamList.length,
-          tool: tool,
-          beamList: beamObjs,
-          nodeList: nodeObjs,
-          beamsList: beamObjs,
-          nodeList: nodeObjs
-        })
+        timestamp: new Date().toLocaleString(),
+        weight: structure.lp.obj,
+        nodes: project.easel.pad.sketch.structure.nodeList.length,
+        beams: project.easel.pad.sketch.structure.beamList.length,
+        tool: tool,
+        beamList: beamObjs,
+        nodeList: nodeObjs,
+        beamsList: beamObjs,
+        nodeList: nodeObjs
       });
     };
 
@@ -121,12 +120,13 @@
 
   Versions = (function() {
 
-    function Versions(project, newVersion) {
+    function Versions(project, structure, newVersion) {
       this.project = project;
       this.htmlLoc = "#HistorySketchesView";
       this.previewHtmlLoc = "#PreviewHistory";
       this.history = [];
-      this.newVersion(newVersion);
+      this.newVersion(structure, newVersion);
+      this.updatePreviewHistory(structure, true);
     }
 
     Versions.prototype.newVersion = function(structure, newVersion) {
@@ -223,25 +223,27 @@
       }
     };
 
-    Versions.prototype.updatePreviewHistory = function(structure) {
+    Versions.prototype.updatePreviewHistory = function(structure, initialize) {
       var genhelper, previewEasel, previewPad, previewVersionObj;
-      if (!(structure != null)) {
-        structure = new tacit.Structure(this.project.easel.pad.sketch.structure);
+      if (!initialize) {
+        if (!(structure != null)) {
+          structure = new tacit.Structure(this.project.easel.pad.sketch.structure);
+        }
+        this.project.easel.pad.sketch.fea();
+        previewVersionObj = d3.select("#PreviewHistory").append("div").attr("id", "ver" + window.partnernum + "-" + structure.historyLength).classed("ver", true);
+        previewEasel = new dummyEasel(this, structure.historyLength, this.project);
+        previewVersionObj.append("div").attr("id", "versvg" + window.partnernum + "-" + structure.historyLength).classed("versvg", true);
+        previewEasel.weightDisplay = previewVersionObj.append("div").classed("verwd", true)[0][0];
+        previewEasel.weightDisplay.innerText = "\$" + Math.round(structure.lp.obj / 100);
+        previewPad = new tacit.Pad(previewEasel, "#versvg" + window.partnernum + "-" + structure.historyLength, 50, 50, structure);
+        previewPad.load(structure, genhelper = false);
+        previewPad.sketch.nodeSize = 0;
+        previewPad.sketch.showforce = false;
+        previewPad.sketch.updateDrawing();
+        this.history.push(previewPad);
+        structure.solve();
+        return previewPad.sketch.fea();
       }
-      this.project.easel.pad.sketch.fea();
-      previewVersionObj = d3.select("#PreviewHistory").append("div").attr("id", "ver" + window.partnernum + "-" + structure.historyLength).classed("ver", true);
-      previewEasel = new dummyEasel(this, structure.historyLength, this.project);
-      previewVersionObj.append("div").attr("id", "versvg" + window.partnernum + "-" + structure.historyLength).classed("versvg", true);
-      previewEasel.weightDisplay = previewVersionObj.append("div").classed("verwd", true)[0][0];
-      previewEasel.weightDisplay.innerText = "\$" + Math.round(structure.lp.obj / 100);
-      previewPad = new tacit.Pad(previewEasel, "#versvg" + window.partnernum + "-" + structure.historyLength, 50, 50, structure);
-      previewPad.load(structure, genhelper = false);
-      previewPad.sketch.nodeSize = 0;
-      previewPad.sketch.showforce = false;
-      previewPad.sketch.updateDrawing();
-      this.history.push(previewPad);
-      structure.solve();
-      return previewPad.sketch.fea();
     };
 
     Versions.prototype.save = function(structure) {

@@ -70,21 +70,22 @@ class dummyEasel
                     immovable: immovable
         firebase.database().ref(window.sessionid+"/"+window.usernum+"/"+window.problem_order+'/structures/').push().set
             timestamp: new Date().toLocaleString()
-                weight: structure.lp.obj
-                nodes: project.easel.pad.sketch.structure.nodeList.length
-                beams: project.easel.pad.sketch.structure.beamList.length
-                tool: tool
-                beamList: beamObjs
-                nodeList: nodeObjs
-                beamsList: beamObjs
-                nodeList: nodeObjs
+            weight: structure.lp.obj
+            nodes: project.easel.pad.sketch.structure.nodeList.length
+            beams: project.easel.pad.sketch.structure.beamList.length
+            tool: tool
+            beamList: beamObjs
+            nodeList: nodeObjs
+            beamsList: beamObjs
+            nodeList: nodeObjs
 
 class Versions
-    constructor: (@project, newVersion) ->
+    constructor: (@project, structure, newVersion) ->
         @htmlLoc = "#HistorySketchesView"
         @previewHtmlLoc = "#PreviewHistory"
         @history = []
-        @newVersion(newVersion)
+        @newVersion(structure, newVersion)
+        @updatePreviewHistory(structure, true)
 
     newVersion: (structure, newVersion) ->
         if newVersion
@@ -163,23 +164,24 @@ class Versions
                 if window.triggers.beat?
                     window.triggers.beat()
 
-    updatePreviewHistory: (structure) ->
-        if not structure?
-            structure = new tacit.Structure(@project.easel.pad.sketch.structure)
-        @project.easel.pad.sketch.fea()
-        previewVersionObj = d3.select("#PreviewHistory").append("div").attr("id", "ver"+window.partnernum+"-"+structure.historyLength).classed("ver", true)
-        previewEasel = new dummyEasel(this, structure.historyLength, @project)
-        previewVersionObj.append("div").attr("id", "versvg"+window.partnernum+"-"+structure.historyLength).classed("versvg", true)
-        previewEasel.weightDisplay = previewVersionObj.append("div").classed("verwd", true)[0][0]
-        previewEasel.weightDisplay.innerText = "\$"+Math.round(structure.lp.obj/100)
-        previewPad = new tacit.Pad(previewEasel, "#versvg"+window.partnernum+"-"+structure.historyLength, 50, 50, structure)
-        previewPad.load(structure, genhelper=false)
-        previewPad.sketch.nodeSize = 0
-        previewPad.sketch.showforce = false
-        previewPad.sketch.updateDrawing()
-        @history.push(previewPad)
-        structure.solve()
-        previewPad.sketch.fea()
+    updatePreviewHistory: (structure, initialize) ->
+        if not initialize
+            if not structure?
+                structure = new tacit.Structure(@project.easel.pad.sketch.structure)
+            @project.easel.pad.sketch.fea()
+            previewVersionObj = d3.select("#PreviewHistory").append("div").attr("id", "ver"+window.partnernum+"-"+structure.historyLength).classed("ver", true)
+            previewEasel = new dummyEasel(this, structure.historyLength, @project)
+            previewVersionObj.append("div").attr("id", "versvg"+window.partnernum+"-"+structure.historyLength).classed("versvg", true)
+            previewEasel.weightDisplay = previewVersionObj.append("div").classed("verwd", true)[0][0]
+            previewEasel.weightDisplay.innerText = "\$"+Math.round(structure.lp.obj/100)
+            previewPad = new tacit.Pad(previewEasel, "#versvg"+window.partnernum+"-"+structure.historyLength, 50, 50, structure)
+            previewPad.load(structure, genhelper=false)
+            previewPad.sketch.nodeSize = 0
+            previewPad.sketch.showforce = false
+            previewPad.sketch.updateDrawing()
+            @history.push(previewPad)
+            structure.solve()
+            previewPad.sketch.fea()
 
     save: (structure) ->
         if window.triggers.save?
