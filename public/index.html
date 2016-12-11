@@ -281,7 +281,7 @@
      Congratulations! Your saved design has met the starting goal, and the status bar will now also tell you the cost of your <i>best saved design.</i>
 
      <script>
-     var structure = tutorialstruct()
+     var structure = new tacit.Structure(tutorialstruct())
      var gd = 1.65
      new structure.Beam({x:24, y:gd}, {x:20, y:60})
      new structure.Beam({x:60, y:gd}, {x:60, y:60})
@@ -289,7 +289,6 @@
      new structure.Beam({x:30, y:30}, {x:60, y:gd})
      new structure.Beam({x:30, y:30}, {x:20, y:60})
      new structure.Beam({x:30, y:30}, {x:60, y:60})
-     versions.save(structure)
      project.easel.pad.sketch.fea()
      \<\/script\>
 
@@ -316,7 +315,7 @@
     if (!window.tool.sized_beams)
         nextTutorialStep()
     else {
-        var structure = tutorialstruct()
+        var structure = new tacit.Structure(tutorialstruct())
         var gd = 1.65
         new structure.Beam({x:20, y:gd}, {x:20, y:60}, 50)
         new structure.Beam({x:60, y:gd}, {x:60, y:60}, 100)
@@ -324,7 +323,10 @@
         new structure.Beam({x:30, y:30}, {x:60, y:gd}, 100)
         new structure.Beam({x:30, y:30}, {x:20, y:60})
         new structure.Beam({x:30, y:30}, {x:60, y:60})
-        setTimeout(function() {versions.save(structure); project.easel.pad.sketch.fea()}, 10)
+		setTimeout(function() {
+			versions.save(new tacit.Structure(structure));
+			project.easel.pad.sketch.fea()
+		}, 10)
     }
     \<\/script\>""",
     """ #{if not window.tool.sized_beams then "<script>nextTutorialStep()\<\/script\>" else ""}
@@ -339,7 +341,7 @@
     """#{if not window.tool.sized_beams then " " else ""}<b> Load the next problem (the newest save) to continue. </b>
     <script> window.triggers.load = upNext()\<\/script\>
     <script>
-    var structure = tutorialstruct()
+    var structure = new tacit.Structure(tutorialstruct())
     var gd = 1.65
     new structure.Beam({x:20, y:gd}, {x:19, y:40})
     new structure.Beam({x:19, y:40}, {x:20, y:60})
