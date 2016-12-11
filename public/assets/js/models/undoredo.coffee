@@ -30,7 +30,7 @@ class UndoRedo
                 $("#export-btn").click()
                 window.log += "# ran out of time at "+new Date().toLocaleString()+" \n"
 
-                firebase.database().ref(window.sessionid+"/"+window.usernum+"/"+window.problem_order+'/structures/').push().set
+                firebase.database().ref(window.sessionid+"/"+window.usernum+"/"+window.problem_order+'/events/').push().set
                     type: "ran out of time"
                     timestamp: new Date().toLocaleString()
             else if t >= 0
