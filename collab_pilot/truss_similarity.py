@@ -485,7 +485,7 @@ def test_unmatch():
 	match_nodes(struct1, struct3, problem_nodes)
 	print "---------------------"
 	print "Structure 1 and 4:"
-	match_nodes(struct1, struct3, problem_nodes)
+	match_nodes(struct1, struct4, problem_nodes)
 	print "---------------------"
 	print "Structure 2 and 3:"
 	match_nodes(struct2, struct3, problem_nodes)
