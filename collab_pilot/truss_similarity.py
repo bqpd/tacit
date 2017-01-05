@@ -84,9 +84,8 @@ def match_beams(node_mapping1, structure1, node_mapping2, structure2, node_metri
 				beam1 = get_euclidean_distance(node_mapping1[i], node_mapping1[j])
 				#beam2 = get_euclidean_distance(node_mapping2[i], node_mapping2[j])
 				#beam_metric += ((beam1 + beam2)/2)
-				print "!!!!!!!!adding ", beam1 , " to beam_metric"
 				beam_metric += beam1
-	print "BEAMS METRIC : ", beam_metric
+	print "beams metric: ", beam_metric
 	unmatched_nodes_beams(node_mapping1, beam_mapping1, beams1, structure1, node_mapping2, beam_mapping2, beams2, structure2, beam_metric + node_metric)
 
 '''
@@ -104,7 +103,6 @@ For each unmapped node:
 	  and not connected in structure2.
 '''
 def unmatched_nodes_beams(node_mapping1, beam_mapping1, beams1, structure1, node_mapping2, beam_mapping2, beams2, structure2, metric):
-	print "unmatched nodes and beams start"
 	unmapped_nodes = []
 	unmatched_metric = 0
 	# no unmatched nodes
@@ -114,36 +112,30 @@ def unmatched_nodes_beams(node_mapping1, beam_mapping1, beams1, structure1, node
 	# look at each unmapped nodes
 	first_unmapped = len(node_mapping1)
 	for i in range(first_unmapped, len(node_mapping2)):
-		print "appending node: ", node_mapping2[i]
 		unmapped_node = node_mapping2[i]
 		unmapped_nodes.append(node_mapping2[i])
 	# array containing all unmapped beams
 	non_replacement_beams = []
 	replacement_beams = []
 	# make a 2D array of lists of unmapped beam for each unmapped node
-	print "unmapped_nodes = ", unmapped_nodes
 	unmapped_beams = [[] for i in range(len(unmapped_nodes))]
 	for i in range(len(unmapped_nodes)):
 		node = unmapped_nodes[i]
-		print "node = ", node
 		for beam in beams2:
-			print "beam = ", beam
 			if (beam["start_x"] == node["x"]) and (beam["start_y"] == node["y"]):
 				non_replacement_beams.append(beam)
 				unmapped_beams[i].append(beam)
 			if (beam["end_x"] == node["x"]) and (beam["end_y"] == node["y"]):
 				non_replacement_beams.append(beam)
 				unmapped_beams[i].append(beam)
-	print "unmapped_beams = ", unmapped_beams
 	# remove beams that replaces a beam in structure 1
 	for beam_set in unmapped_beams:
-		print "beam_set = ", beam_set
 		if len(beam_set) > 1:
 			for i in range(len(beam_set)-1):
 				for j in range(i+1, len(beam_set)):
 					b1 = beam_set[i]
 					b2 = beam_set[j]
-					midpoint, beam = is_replacement(b1, b2, structure1)
+					midpoint, beam = is_replacement(b1, b2, structure1, structure2)
 					if beam != None:
 						if b1 in non_replacement_beams:
 							non_replacement_beams.remove(b1)
@@ -151,19 +143,15 @@ def unmatched_nodes_beams(node_mapping1, beam_mapping1, beams1, structure1, node
 						if b2 in non_replacement_beams:
 							non_replacement_beams.remove(b2)
 							replacement_beams.append(b2)
-						# TODO: add difference to original beam
 						n1 = {"x": beam["start_x"], "y": beam["start_y"], "z": beam["start_z"]}
 						n2 = {"x": beam["end_x"], "y": beam["end_y"], "z": beam["end_z"]}
 						difference = get_difference(midpoint, n1, n2)
-						print "adding unmatched_metric by : " , difference
 						unmatched_metric += difference
 						unmatched_metric -= get_beam_length(beam)
-						print "subtracting unmatched metric by: ", get_beam_length(beam)
 		else:
 			continue
 
 	# add up beams to metric
-	print "non_replacement_beams = " , non_replacement_beams
 	for beam in non_replacement_beams:
 		unmatched_metric += get_beam_length(beam)
 	print "FINAL METRIC: " , unmatched_metric + metric
@@ -257,14 +245,9 @@ Given a three nodes, return the height of the triangle with the three nodes as
 vertices, and first node as apex of the triangle.
 '''
 def get_difference(node1, node2, node3):
-	print "node1 = ", node1
-	print "node2 = ", node2
-	print "node3 = ", node3
 	area = abs(node1["x"]*(node2["y"]-node3["y"]) + node2["x"]*(node3["y"]-node1["y"]) + node3["x"]*(node1["y"]-node2["y"]))/2
-	print "area = ", area
 	base = get_euclidean_distance(node2, node3)
 	height = 2 * area / base
-	print "height = " , height
 	return height
 
 '''
@@ -274,8 +257,7 @@ beam components join.
 "Replace" defined as if two nodes connected to the extra ndoe is connected in structure 1 and
 not connected in structure 2.
 '''
-def is_replacement(beam1, beam2, structure):
-	print "is_replacement start"
+def is_replacement(beam1, beam2, structure1, structure2):
 	beam1_start = {"x": beam1["start_x"], "y": beam1["start_y"], "z": beam1["start_z"]}
 	beam1_end = {"x": beam1["end_x"], "y": beam1["end_y"], "z": beam1["end_z"]}
 	beam2_start = {"x": beam2["start_x"], "y": beam2["start_y"], "z": beam2["start_z"]}
@@ -303,7 +285,10 @@ def is_replacement(beam1, beam2, structure):
 		midpoint = beam1_end
 	else:
 		raise Exception("beams from same beam_set should share a node")
-	return (midpoint, is_connected(node1, node2, structure))
+	if (is_connected(node1, node2, structure1) != None) and not (is_connected(node1, node2, structure2) != None):
+		return (midpoint, is_connected(node1, node2, structure1))
+	else:
+		return (midpoint, None)
 '''
 Given two nodes and a structure, return whether the the beam that connects
 the two nodes if the two nodes are connected, return None otherwise.
