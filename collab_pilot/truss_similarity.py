@@ -453,6 +453,25 @@ def test_unmatch():
 			{"start_x": 57.5, "start_y": 40.825, "start_z": 0, "end_x": 42, "end_y": 72, "end_z": 0},
 		]
 	}
+	struct4 = {
+		"nodeList" : [
+			{"x": 42, "y": 72, "z": 0},
+			{"x": 42, "y": 97, "z": 0},
+			{"x": 20, "y": 1.65, "z": 0},
+			{"x": 60, "y": 1.65, "z": 0},
+			{"x": 55, "y": 80, "z": 0},
+			{"x": 70, "y": 40.825, "z": 0},
+		],
+		"beamList": [
+			{"start_x": 42, "start_y": 97, "start_z": 0, "end_x": 42, "end_y": 72, "end_z": 0},
+			{"start_x": 42, "start_y": 72, "start_z": 0, "end_x": 20, "end_y": 1.65, "end_z": 0},
+			{"start_x": 42, "start_y": 72, "start_z": 0, "end_x": 60, "end_y": 1.65, "end_z": 0},
+			{"start_x": 42, "start_y": 97, "start_z": 0, "end_x": 55, "end_y": 80, "end_z": 0},
+			{"start_x": 42, "start_y": 72, "start_z": 0, "end_x": 55, "end_y": 80, "end_z": 0},
+			{"start_x": 70, "start_y": 40.825, "start_z": 0, "end_x": 55, "end_y": 80, "end_z": 0},
+			{"start_x": 70, "start_y": 40.825, "start_z": 0, "end_x": 60, "end_y": 1.65, "end_z": 0},
+		]
+	}
 	problem_nodes = [
 		{"x": 42, "y": 72, "z": 0},
 		{"x": 42, "y": 97, "z": 0},
@@ -462,10 +481,19 @@ def test_unmatch():
 	print "Structure 1 and 2:"
 	match_nodes(struct1, struct2, problem_nodes)
 	print "---------------------"
+	print "Structure 1 and 3:"
+	match_nodes(struct1, struct3, problem_nodes)
+	print "---------------------"
+	print "Structure 1 and 4:"
+	match_nodes(struct1, struct3, problem_nodes)
+	print "---------------------"
 	print "Structure 2 and 3:"
 	match_nodes(struct2, struct3, problem_nodes)
 	print "---------------------"
-	print "Structure 1 and 3:"
-	match_nodes(struct1, struct3, problem_nodes)
+	print "Structure 2 and 4:"
+	match_nodes(struct2, struct4, problem_nodes)
+	print "---------------------"
+	print "Structure 3 and 4:"
+	match_nodes(struct3, struct4, problem_nodes)
 	
 test_unmatch()
