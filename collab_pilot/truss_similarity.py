@@ -11,19 +11,29 @@ def match_nodes(structure1, structure2, problem):
 	mapping1 = []
 	mapping2 = []
 
+	s1_nodes = []
+	s2_nodes = []
+	for node in structure1["nodeList"]:
+		n = {"x": node["x"], "y": node["y"], "z": node["z"]}
+		s1_nodes.append(n)
+	for node in structure2["nodeList"]:
+		n = {"x": node["x"], "y": node["y"], "z": node["z"]}
+		s2_nodes.append(n)
+
 	# nodes from the problem must match up
 	for node in problem:
-		if (not node in structure1["nodeList"]) or (not node in structure2["nodeList"]):
+		n = {"x": node["x"], "y": node["y"], "z": node["z"]}
+		if not (approximately_in(n, s1_nodes, 0.0001)) or not (approximately_in(n, s2_nodes, 0.0001)):
 			raise Exception("structure does not contain nodes from problem")
 		mapping1.append(node)
 		mapping2.append(node)
 	#sort nodes by x coordinates first
-	structure1["nodeList"].sort(key=operator.itemgetter("x"))
-	structure2["nodeList"].sort(key=operator.itemgetter("x"))
-	for node in structure1["nodeList"]:
+	s1_nodes.sort(key=operator.itemgetter("x"))
+	s2_nodes.sort(key=operator.itemgetter("x"))
+	for node in s1_nodes:
 		if not node in problem:
 			mapping1.append(node)
-	for node in structure2["nodeList"]:
+	for node in s2_nodes:
 		if not node in problem:
 			mapping2.append(node)
 	metric = get_node_similarity_metric(mapping1, mapping2)
@@ -43,7 +53,7 @@ def match_nodes(structure1, structure2, problem):
 				# switch back if metric doesn't improve
 				mapping2[i], mapping2[j] = mapping2[j], mapping2[i]
 	print "node metrics: ", metric
-	match_beams(mapping1, structure1, mapping2, structure2, metric)
+	return match_beams(mapping1, structure1, mapping2, structure2, metric)
 
 
 '''
@@ -86,12 +96,11 @@ def match_beams(node_mapping1, structure1, node_mapping2, structure2, node_metri
 				#beam_metric += ((beam1 + beam2)/2)
 				beam_metric += beam1
 	print "beams metric: ", beam_metric
-	unmatched_nodes_beams(node_mapping1, beam_mapping1, beams1, structure1, node_mapping2, beam_mapping2, beams2, structure2, beam_metric + node_metric)
+	return unmatched_nodes_beams(node_mapping1, beam_mapping1, beams1, structure1, node_mapping2, beam_mapping2, beams2, structure2, beam_metric + node_metric)
 
 '''
 Take into account nodes and beams that were not mapped.
 
-If node splits an original beam, don't increase metric -- TODO: fix it
 If beams add up to original beams, remove them from metric calculation.
 For each unmapped node:
 	- if connected by one unmapped beam, add beam to metric
@@ -173,7 +182,7 @@ Given two nodes, calculates the Euclidean distance
 between them.
 '''
 def get_euclidean_distance(node1, node2):
-	distance = (node1["x"] - node2["x"])**2 + (node1["y"] - node2["y"])**2 + (node1["z"] - node2["z"])**2
+	distance = (float(node1["x"]) - float(node2["x"]))**2 + (float(node1["y"]) - float(node2["y"]))**2 + (float(node1["z"]) - float(node2["z"]))**2
 	return distance**0.5
 
 '''
@@ -302,6 +311,19 @@ def is_connected(node1, node2, structure):
 		return beam2
 	else:
 		return None
+'''
+Given a node and a node list and an epsilon, return true if the node is
+is approximately in the node list. Approximately being if each of the node's
+coordinates differs from the nodes in the node list by at most epsilon.
+'''
+def approximately_in(node, nodeList, epsilon):
+	if node in nodeList:
+		return True
+	found = False
+	for n in nodeList:
+		if (abs(float(node["x"]) - float(n["x"])) <= epsilon) and (abs(float(node["y"]) - float(n["y"])) <= epsilon) and (abs(float(node["z"]) - float(n["z"])) <= epsilon):
+			found = True
+	return found
 
 def test_splits_beam():
 	node = {"x": 10, "y": 20}
@@ -564,4 +586,4 @@ def test_unmatch():
 	print "Structure 5 and 6:"
 	match_nodes(struct5, struct6, problem_nodes)
 	
-test_unmatch()
+#test_unmatch()
