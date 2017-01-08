@@ -9,6 +9,8 @@ body {
 
 #steptext {
 	color: rgba(61, 49, 48, 0.5);
+	overflow-y: scroll !important;
+	height: 80%;
 }
 
 
