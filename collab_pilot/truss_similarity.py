@@ -52,7 +52,7 @@ def match_nodes(structure1, structure2, problem):
 			else:
 				# switch back if metric doesn't improve
 				mapping2[i], mapping2[j] = mapping2[j], mapping2[i]
-	print "node metrics: ", metric
+	#print "node metrics: ", metric
 	return match_beams(mapping1, structure1, mapping2, structure2, metric)
 
 
@@ -95,7 +95,7 @@ def match_beams(node_mapping1, structure1, node_mapping2, structure2, node_metri
 				#beam2 = get_euclidean_distance(node_mapping2[i], node_mapping2[j])
 				#beam_metric += ((beam1 + beam2)/2)
 				beam_metric += beam1
-	print "beams metric: ", beam_metric
+	#print "beams metric: ", beam_metric
 	return unmatched_nodes_beams(node_mapping1, beam_mapping1, beams1, structure1, node_mapping2, beam_mapping2, beams2, structure2, beam_metric + node_metric)
 
 '''
@@ -116,7 +116,7 @@ def unmatched_nodes_beams(node_mapping1, beam_mapping1, beams1, structure1, node
 	unmatched_metric = 0
 	# no unmatched nodes
 	if len(node_mapping1) == len(node_mapping2):
-		print "no additional nodes, final metric: ", metric
+		#print "no additional nodes, final metric: ", metric
 		return metric
 	# look at each unmapped nodes
 	first_unmapped = len(node_mapping1)
@@ -163,7 +163,7 @@ def unmatched_nodes_beams(node_mapping1, beam_mapping1, beams1, structure1, node
 	# add up beams to metric
 	for beam in non_replacement_beams:
 		unmatched_metric += get_beam_length(beam)
-	print "FINAL METRIC: " , unmatched_metric + metric
+	#print "FINAL METRIC: " , unmatched_metric + metric
 	return unmatched_metric + metric
 
 ###################
