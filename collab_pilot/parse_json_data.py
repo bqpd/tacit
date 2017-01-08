@@ -60,6 +60,7 @@ with open('tacit-collab-export.json') as data:
 								continue
 							elif (float(structure["weight"])/100) < best_score:
 								best_score = float(structure["weight"])/100
+						print best_score
 						best_scores_each_user.append(best_score)
 						score_vs_load_count.append((best_score, user_load_count))
 				first_user = False
