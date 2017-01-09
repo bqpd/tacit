@@ -33,6 +33,7 @@ with open('tacit-collab-export.json') as data:
 			user1_structures = []
 			user2_structures = []
 			for user in data[pilotnum]:
+				best_structure = None
 				for problem in user:
 					best_score = 10000
 					if not "tutorial" in problem: # don't include tutorial
@@ -60,33 +61,60 @@ with open('tacit-collab-export.json') as data:
 								continue
 							elif (float(structure["weight"])/100) < best_score:
 								best_score = float(structure["weight"])/100
+								best_structure = structure
 						print best_score
 						best_scores_each_user.append(best_score)
 						score_vs_load_count.append((best_score, user_load_count))
 				first_user = False
+
 			user1_structures.sort(key=lambda x: x["timestamp"])
 			user2_structures.sort(key=lambda x: x["timestamp"])
+			startdate = min(dt_from_js_datestr(user1_structures[0]["timestamp"]), dt_from_js_datestr(user2_structures[0]["timestamp"]))
 
 			# Plot of score throughout problem
-			startdate = min(dt_from_js_datestr(user1_structures[0]["timestamp"]), dt_from_js_datestr(user2_structures[0]["timestamp"]))
-			user1_scores = [s["weight"] for s in user1_structures if ("weight" in s and s["weight"] < 100000)]
-			user1_times = [(dt_from_js_datestr(s["timestamp"]) - startdate).total_seconds() for s in user1_structures if "weight" in s and s["weight"] < 100000]
-			user2_scores = [s["weight"] for s in user2_structures if ("weight" in s and s["weight"] < 100000)]
-			user2_times = [(dt_from_js_datestr(s["timestamp"]) - startdate).total_seconds() for s in user2_structures if "weight" in s and s["weight"] < 100000]
+			user1_scores = [s["weight"]/100 for s in user1_structures if ("weight" in s and s["weight"]/100 < 1000)]
+			user1_times_less_than_max = [(dt_from_js_datestr(s["timestamp"]) - startdate).total_seconds() for s in user1_structures if "weight" in s and s["weight"] < 100000]
+			user2_scores = [s["weight"]/100 for s in user2_structures if ("weight" in s and s["weight"]/100 < 1000)]
+			user2_times_less_than_max = [(dt_from_js_datestr(s["timestamp"]) - startdate).total_seconds() for s in user2_structures if "weight" in s and s["weight"] < 100000]
 			mlp.clf()
-			mlp.scatter(user1_times,user1_scores, c="b", label="User 1") 
-			mlp.scatter(user2_times,user2_scores, c="r", label="User 2") 
-			score_graph_title = "Collaboration Score vs. Structures " + pilotnum
+			mlp.scatter(user1_times_less_than_max,user1_scores, c="b", label="User 1") 
+			mlp.scatter(user2_times_less_than_max,user2_scores, c="r", label="User 2") 
+			score_graph_title = "Collaboration Score vs. Time" + pilotnum
 			mlp.title(score_graph_title)
 			mlp.xlim(xmin=0)
-			mlp.ylim(ymin=30000,ymax=100000)
-			mlp.yscale('log')
+			mlp.ylim(ymin=300,ymax=1000)
 			mlp.ylabel("Score / Cost of Structure [$]")
+			mlp.yscale('log')
 			mlp.xlabel("Time [seconds]")
+			mlp.legend(loc="upper right")
 			score_graph_filename = "graphs/score_vs_time" + pilotnum
 			mlp.savefig(score_graph_filename)
 
-			# Plot similarity between current and final structure
+			# Plot similarity between current and best structure
+			similarity_with_best1 = []
+			similarity_with_best2 = []
+			for structure in user1_structures:
+				if "weight" in structure:
+					metric = match_nodes(structure, best_structure, problem_nodes)
+					similarity_with_best1.append(metric)
+			for structure in user2_structures:
+				if "weight" in structure:
+					metric = match_nodes(structure, best_structure, problem_nodes)
+					similarity_with_best2.append(metric)
+			mlp.clf()
+			user1_times_all = [(dt_from_js_datestr(s["timestamp"]) - startdate).total_seconds() for s in user1_structures if "weight" in s]
+			user2_times_all = [(dt_from_js_datestr(s["timestamp"]) - startdate).total_seconds() for s in user2_structures if "weight" in s]
+			mlp.scatter(user1_times_all, similarity_with_best1, c="b", label="User 1")
+			mlp.scatter(user2_times_all, similarity_with_best2, c="r", label="User 2")
+			similarity_with_best_title = "Similarity with Best Structure vs Time " + pilotnum
+			mlp.title(similarity_with_best_title)
+			mlp.ylim(ymin=0)
+			mlp.xlim(xmin=0)
+			mlp.ylabel("Similarity with Best Structure")
+			mlp.xlabel("Time [seconds]")
+			mlp.legend(loc="upper right")
+			similarity_with_best_filename = "graphs/similiarity_with_best_vs_time" + pilotnum
+			mlp.savefig(similarity_with_best_filename)
 
 			# Plot similarity between collab structures
 			i = 0
