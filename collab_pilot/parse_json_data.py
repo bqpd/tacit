@@ -66,16 +66,37 @@ with open('tacit-collab-export.json') as data:
 				first_user = False
 			user1_structures.sort(key=lambda x: x["timestamp"])
 			user2_structures.sort(key=lambda x: x["timestamp"])
+
+			# Plot of score throughout problem
+			startdate = min(dt_from_js_datestr(user1_structures[0]["timestamp"]), dt_from_js_datestr(user2_structures[0]["timestamp"]))
+			user1_scores = [s["weight"] for s in user1_structures if ("weight" in s and s["weight"] < 100000)]
+			user1_times = [(dt_from_js_datestr(s["timestamp"]) - startdate).total_seconds() for s in user1_structures if "weight" in s and s["weight"] < 100000]
+			user2_scores = [s["weight"] for s in user2_structures if ("weight" in s and s["weight"] < 100000)]
+			user2_times = [(dt_from_js_datestr(s["timestamp"]) - startdate).total_seconds() for s in user2_structures if "weight" in s and s["weight"] < 100000]
+			mlp.clf()
+			mlp.scatter(user1_times,user1_scores, c="b", label="User 1") 
+			mlp.scatter(user2_times,user2_scores, c="r", label="User 2") 
+			score_graph_title = "Collaboration Score vs. Structures " + pilotnum
+			mlp.title(score_graph_title)
+			mlp.xlim(xmin=0)
+			mlp.ylim(ymin=30000,ymax=100000)
+			mlp.yscale('log')
+			mlp.ylabel("Score / Cost of Structure [$]")
+			mlp.xlabel("Time [seconds]")
+			score_graph_filename = "graphs/score_vs_time" + pilotnum
+			mlp.savefig(score_graph_filename)
+
+			# Plot similarity between current and final structure
+
+			# Plot similarity between collab structures
 			i = 0
 			j = 0
-			s1 = user1_structures[i]
-			s2 = user2_structures[j]	
-			s1_timestamp = dt_from_js_datestr(s1["timestamp"])
-			s2_timestamp = dt_from_js_datestr(s2["timestamp"])
-			similarity = []
+			similarity_data = []
 			while i < len(user1_structures) and j < len(user2_structures):
 				s1 = user1_structures[i]
 				s2 = user2_structures[j]
+				s1_timestamp = dt_from_js_datestr(s1["timestamp"])
+				s2_timestamp = dt_from_js_datestr(s2["timestamp"])
 				if "type" in s1:
 					i += 1
 					continue
@@ -83,23 +104,27 @@ with open('tacit-collab-export.json') as data:
 					j += 1
 					continue
 				metric = match_nodes(s1, s2, problem_nodes)
-				similarity.append(metric)
 				if s1_timestamp < s2_timestamp:
 					i += 1
+					similarity_data.append((metric, (s1_timestamp - startdate).total_seconds()))
 				elif s1_timestamp > s2_timestamp:
 					j += 1
+					similarity_data.append((metric, (s2_timestamp - startdate).total_seconds()))
 				else:
 					i += 1
 					j += 1
+					similarity_data.append((metric, (s1_timestamp - startdate).total_seconds()))
 			# Plot similarity between structures
 			mlp.clf()
-			mlp.scatter(list(range(0,len(similarity))),similarity)
+			similarity = [s[0] for s in similarity_data]
+			times = [s[1] for s in similarity_data]
+			mlp.scatter(times,similarity)
 			graph_title = "Similarity Between Structures for " + pilotnum
 			mlp.title(graph_title)
 			mlp.ylim(ymin=0)
 			mlp.xlim(xmin=0)
 			mlp.ylabel("Similarity Metric")
-			mlp.xlabel("Structure in Chronological Order")
+			mlp.xlabel("Time [seconds]")
 			filename = "graphs/similarity" + pilotnum
 			mlp.savefig(filename)
 
