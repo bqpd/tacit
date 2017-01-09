@@ -8,6 +8,10 @@ Number of nodes in structure1 is less than or equal
 to number of nodes in structure2
 '''
 def match_nodes(structure1, structure2, problem):
+	if len(structure1["nodeList"]) > len(structure2["nodeList"]):
+		temp = structure1
+		structure1 = structure2
+		structure2 = temp
 	mapping1 = []
 	mapping2 = []
 
@@ -23,20 +27,25 @@ def match_nodes(structure1, structure2, problem):
 	# nodes from the problem must match up
 	for node in problem:
 		n = {"x": node["x"], "y": node["y"], "z": node["z"]}
-		if not (approximately_in(n, s1_nodes, 0.0001)) or not (approximately_in(n, s2_nodes, 0.0001)):
+		problem_node_in_s1 = approximately_in(n, s1_nodes, 0.0001)
+		problem_node_in_s2 = approximately_in(n, s2_nodes, 0.0001)
+		if problem_node_in_s1 == None or problem_node_in_s2 == None:
 			raise Exception("structure does not contain nodes from problem")
-		mapping1.append(node)
-		mapping2.append(node)
+		mapping1.append(problem_node_in_s1)
+		mapping2.append(problem_node_in_s2)
 	#sort nodes by x coordinates first
 	s1_nodes.sort(key=operator.itemgetter("x"))
 	s2_nodes.sort(key=operator.itemgetter("x"))
 	for node in s1_nodes:
-		if not node in problem:
+		if not node in problem and not node in mapping1:
 			mapping1.append(node)
 	for node in s2_nodes:
-		if not node in problem:
+		if not node in problem and not node in mapping2:
 			mapping2.append(node)
 	metric = get_node_similarity_metric(mapping1, mapping2)
+	if len(mapping1) > len(mapping2):
+		print "node list 1= " , len(structure1["nodeList"])
+		print "node list 2= ", len(structure2["nodeList"])
 	for i in range(len(mapping1)):
 		for j in range(len(mapping2)):
 			if i < len(problem) or j < len(problem) or i == j:
@@ -314,16 +323,17 @@ def is_connected(node1, node2, structure):
 '''
 Given a node and a node list and an epsilon, return true if the node is
 is approximately in the node list. Approximately being if each of the node's
-coordinates differs from the nodes in the node list by at most epsilon.
+coordinates differs from the nodes in the node list by at most epsilon. If it is
+approximately in the list, then return it otherwise return None.
 '''
 def approximately_in(node, nodeList, epsilon):
 	if node in nodeList:
-		return True
+		return node
 	found = False
 	for n in nodeList:
 		if (abs(float(node["x"]) - float(n["x"])) <= epsilon) and (abs(float(node["y"]) - float(n["y"])) <= epsilon) and (abs(float(node["z"]) - float(n["z"])) <= epsilon):
-			found = True
-	return found
+			return n
+	return None
 
 def test_splits_beam():
 	node = {"x": 10, "y": 20}
