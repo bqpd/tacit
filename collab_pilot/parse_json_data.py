@@ -15,7 +15,9 @@ problem_nodes = [
 pp = pprint.PrettyPrinter(indent=2)
 
 best_scores_each_user = []
+score_vs_avg_similarity = []
 score_vs_load_count = []
+
 def dt_from_js_datestr(datestr):
     date, time = datestr.split(", ")
     month, day, year = map(int, date.split("/"))
@@ -32,10 +34,12 @@ with open('tacit-collab-export.json') as data:
 			first_user = True
 			user1_structures = []
 			user2_structures = []
+			user1_best_score = 0
+			user2_best_score = 0
 			for user in data[pilotnum]:
 				best_structure = None
+				best_score = 10000
 				for problem in user:
-					best_score = 10000
 					if not "tutorial" in problem: # don't include tutorial
 						events = user[problem]["events"]
 						structures = user[problem]["structures"]
@@ -65,6 +69,10 @@ with open('tacit-collab-export.json') as data:
 						print best_score
 						best_scores_each_user.append(best_score)
 						score_vs_load_count.append((best_score, user_load_count))
+					if first_user:
+						user1_best_score = best_score
+					else:
+						user2_best_score = best_score
 				first_user = False
 
 			user1_structures.sort(key=lambda x: x["timestamp"])
@@ -106,7 +114,7 @@ with open('tacit-collab-export.json') as data:
 			user2_times_all = [(dt_from_js_datestr(s["timestamp"]) - startdate).total_seconds() for s in user2_structures if "weight" in s]
 			mlp.scatter(user1_times_all, similarity_with_best1, c="b", label="User 1")
 			mlp.scatter(user2_times_all, similarity_with_best2, c="r", label="User 2")
-			similarity_with_best_title = "Similarity with Best Structure vs Time " + pilotnum
+			similarity_with_best_title = "Similarity with Best Structure vs. Time " + pilotnum
 			mlp.title(similarity_with_best_title)
 			mlp.ylim(ymin=0)
 			mlp.xlim(xmin=0)
@@ -156,11 +164,15 @@ with open('tacit-collab-export.json') as data:
 			filename = "graphs/similarity" + pilotnum
 			mlp.savefig(filename)
 
+			# average similarity
+			score_vs_avg_similarity.append((user1_best_score, float(sum(similarity_with_best1))/len(similarity_with_best1)))
+			score_vs_avg_similarity.append((user2_best_score, float(sum(similarity_with_best1))/len(similarity_with_best2)))
 
 # Plot individual best score CDF
 #print best_scores_each_user
 #n_bins = len(best_scores_each_user)
 #n, bins, patches = mlp.hist(best_scores_each_user, n_bins, normed=True, histtype="step", cumulative=True)
+#mlp.clf()
 #mlp.ylim(0,1)
 #mlp.ylabel("Percentile")
 #mlp.xlabel("Score [$]")
@@ -170,11 +182,19 @@ with open('tacit-collab-export.json') as data:
 # Plot score vs. number of times user loaded from teammate
 #scores = [s for (s, l) in score_vs_load_count]
 #loads = [l for (s, l) in score_vs_load_count]
+#mlp.clf()
 #mlp.scatter(loads, scores)
 #mlp.xlabel("Number of Times User Loaded Teammate's Structure")
 #mlp.ylabel("Score [$]")
 #mlp.title("Pilot Study: Score vs. Number of Times User Loaded From Teammate")
 #mlp.savefig("graphs/score_vs_num_times_load")
 
-
-
+# Plot score vs. avg similarity with user's own best structure
+scores = [score for (score, similarity) in score_vs_avg_similarity]
+similarity_metrics = [similarity for (score, similarity) in score_vs_avg_similarity]
+mlp.clf()
+mlp.scatter(similarity_metrics, scores)
+mlp.xlabel("Structural Diversity (Avg Similarity with User's Best Structure)")
+mlp.ylabel("Score [$]")
+mlp.title("Pilot Study: Score vs. Structural Diversity")
+mlp.savefig("graphs/score_vs_avg_similarity")
