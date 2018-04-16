@@ -75,27 +75,36 @@
         location.hash = location.hash.substr(2)
         gd = 1.65
         structure = tutorialstruct()
-        # if location.hash.length < 6
-        #     new structure.Beam({x:20, y:gd}, {x:20, y:60})
-        #     new structure.Beam({x:60, y:gd}, {x:60, y:60})
-        #     new structure.Beam({x:30, y:30}, {x:20, y:gd})
-        #     new structure.Beam({x:30, y:30}, {x:60, y:gd})
-        #     new structure.Beam({x:30, y:30}, {x:20, y:60})
-        #     new structure.Beam({x:30, y:30}, {x:60, y:60})
+        if location.hash.length < 6
+            new structure.Beam({x:20, y:gd}, {x:20, y:60})
+            new structure.Beam({x:60, y:gd}, {x:60, y:60})
+            new structure.Beam({x:30, y:30}, {x:20, y:gd})
+            new structure.Beam({x:30, y:30}, {x:60, y:gd})
+            new structure.Beam({x:30, y:30}, {x:20, y:60})
+            new structure.Beam({x:30, y:30}, {x:60, y:60})
     else if location.hash[1] is "n"
         location.hash = location.hash.substr(2)
 
+    # if location.hash[1] is "m"
+    #     window.tool = {name: "manual", sized_beams: true, autocolor: false, showgrad: false}
+    #     $("#featitle").css("display", "inherit")
+    #     $("#colorbar").css("display", "inherit")
+    # else if location.hash[1] is "a"
+    #     window.tool = {name: "auto", sized_beams: true, autocolor: true, showgrad: false}
+    #     window.feapad = true
+    #     $("#colorbar").css({display: "inherit", top: "15em", right: ""})
     if location.hash[1] is "m"
-        window.tool = {name: "manual", sized_beams: true, autocolor: false, showgrad: false}
-        $("#featitle").css("display", "inherit")
-        $("#colorbar").css("display", "inherit")
-    else if location.hash[1] is "a"
-        window.tool = {name: "auto", sized_beams: true, autocolor: true, showgrad: false}
+        window.tool = {name: "optimal", sized_beams: false, autocolor: true, showgrad: false}
         window.feapad = true
-        $("#colorbar").css({display: "inherit", top: "15em", right: ""})
+        window.delaytime = 10
+    else if location.hash[1] is "a"
+        window.tool = {name: "optimal", sized_beams: false, autocolor: true, showgrad: true}
+        window.feapad = true
+        window.delaytime = 200
     else if location.hash[1] is "o"
         window.tool = {name: "optimal", sized_beams: false, autocolor: true, showgrad: true}
         window.feapad = true
+        window.delaytime = 10
 
     if not window.tutorial
         $("#tutorialpane").css("display", "none")
@@ -113,8 +122,8 @@
 
     if window.tutorial
         window.tutorialidx = 0
-        # if location.hash.length < 6
-        #     window.tutorialidx = 9
+        if location.hash.length < 6
+            window.tutorialidx = 9
         window.nextTutorialStep = ->
             window.tutorialidx++
             if window.tutorialidx <= window.tutorialsteps.length
@@ -365,7 +374,6 @@
 
     cm = window.tacit.colormap
     height = 150
-    window.delaytime = 10
 
     `
     var canvas = d3.select("#colorbar").append("canvas")
