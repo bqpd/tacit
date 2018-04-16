@@ -71,6 +71,9 @@
         project.starttime = new Date()
         window.oclock = setInterval(tickfn, 1000)
 
+    if location.hash is "#" or location.hash is ""
+      location.href = "http://mit.co1.qualtrics.com/SE/?SID=SV_eCJpPsOphiJNGFn"
+
     if location.hash[1] is "t"
         location.hash = location.hash.substr(2)
         gd = 1.65
