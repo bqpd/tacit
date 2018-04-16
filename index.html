@@ -75,13 +75,13 @@
         location.hash = location.hash.substr(2)
         gd = 1.65
         structure = tutorialstruct()
-        if location.hash.length < 6
-            new structure.Beam({x:20, y:gd}, {x:20, y:60})
-            new structure.Beam({x:60, y:gd}, {x:60, y:60})
-            new structure.Beam({x:30, y:30}, {x:20, y:gd})
-            new structure.Beam({x:30, y:30}, {x:60, y:gd})
-            new structure.Beam({x:30, y:30}, {x:20, y:60})
-            new structure.Beam({x:30, y:30}, {x:60, y:60})
+        # if location.hash.length < 6
+        #     new structure.Beam({x:20, y:gd}, {x:20, y:60})
+        #     new structure.Beam({x:60, y:gd}, {x:60, y:60})
+        #     new structure.Beam({x:30, y:30}, {x:20, y:gd})
+        #     new structure.Beam({x:30, y:30}, {x:60, y:gd})
+        #     new structure.Beam({x:30, y:30}, {x:20, y:60})
+        #     new structure.Beam({x:30, y:30}, {x:60, y:60})
     else if location.hash[1] is "n"
         location.hash = location.hash.substr(2)
 
@@ -113,8 +113,8 @@
 
     if window.tutorial
         window.tutorialidx = 0
-        if location.hash.length < 6
-            window.tutorialidx = 9
+        # if location.hash.length < 6
+        #     window.tutorialidx = 9
         window.nextTutorialStep = ->
             window.tutorialidx++
             if window.tutorialidx <= window.tutorialsteps.length
