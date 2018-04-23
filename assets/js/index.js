@@ -2,13 +2,13 @@ function initialize(structure) {
 	window.tutorial_state = -1
 	finalsurvey = "http://mit.co1.qualtrics.com/SE/?SID=SV_eCJpPsOphiJNGFn"
 	intermediatesurveys = {
-						 "ab": "http://mit.co1.qualtrics.com/SE/?SID=SV_eCJpPsOphiJNGFn",
-	                     "mb": "http://mit.co1.qualtrics.com/SE/?SID=SV_eCJpPsOphiJNGFn",
-	                     "ob": "http://mit.co1.qualtrics.com/SE/?SID=SV_eCJpPsOphiJNGFn",
-	                     "as": "http://mit.co1.qualtrics.com/SE/?SID=SV_eCJpPsOphiJNGFn",
-	                     "ms": "http://mit.co1.qualtrics.com/SE/?SID=SV_eCJpPsOphiJNGFn",
-	                     "os": "http://mit.co1.qualtrics.com/SE/?SID=SV_eCJpPsOphiJNGFn",
-	                       }
+		"ab": "http://mit.co1.qualtrics.com/jfe/form/SV_bOWahYvH6tOwoMB",
+		"mb": "http://mit.co1.qualtrics.com/jfe/form/SV_bOWahYvH6tOwoMB",
+		"ob": "http://mit.co1.qualtrics.com/jfe/form/SV_bOWahYvH6tOwoMB",
+		"as": "http://mit.co1.qualtrics.com/jfe/form/SV_bOWahYvH6tOwoMB",
+		"ms": "http://mit.co1.qualtrics.com/jfe/form/SV_bOWahYvH6tOwoMB",
+		"os": "http://mit.co1.qualtrics.com/jfe/form/SV_bOWahYvH6tOwoMB",
+	}
 
 	// initialize easel and stuff
 	var height = parseInt($(window).height() - 110);
