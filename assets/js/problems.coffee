@@ -44,7 +44,7 @@ window.sign = ->
 
         <img src="assets/resources/introimages/sign.png" />
 
-        <p> The goal of this problem is to reduce the cost of your viable solutions, as determined by the mass of steel used in all the beams of your design. If your design reaches the cost threshold you will receive an extra $5 in compensation and if your design is the best design made with this software tool you will receive an additional $55 in compensation.
+        <p> The goal of this problem is to reduce the cost of your viable solutions, as determined by the mass of steel used in all the beams of your design.
         """
 
     window.genhelper = ->
@@ -91,7 +91,7 @@ window.bridge = ->
 
         <img src="assets/resources/introimages/bridge.png" />
 
-        <p> The goal of this problem is to reduce the cost of your viable solutions, as determined by the mass of steel used in all the beams of your design. If your design reaches the cost threshold you will receive an extra $5 in compensation, and if your design is the best design made with this software tool you will receive an additional $55 in compensation.
+        <p> The goal of this problem is to reduce the cost of your viable solutions, as determined by the mass of steel used in all the beams of your design.
         """
 
     window.project.name = "bridge"
@@ -136,7 +136,7 @@ window.bridge2 = ->
 
         <img src="assets/resources/introimages/bridge.png" />
 
-        <p> The goal of this problem is to reduce the cost of your viable solutions, as determined by the mass of steel used in all the beams of your design. If your design reaches the cost threshold you will receive an extra $5 in compensation, and if your design is the best design made with this software tool you will receive an additional $55 in compensation.
+        <p> The goal of this problem is to reduce the cost of your viable solutions, as determined by the mass of steel used in all the beams of your design.
         """
 
     window.project.name = "bridge"
