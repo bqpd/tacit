@@ -1,6 +1,6 @@
 function initialize(structure) {
 	window.tutorial_state = -1
-	finalsurvey = "http://mit.co1.qualtrics.com/SE/?SID=SV_eCJpPsOphiJNGFn"
+	finalsurvey = "http://mit.co1.qualtrics.com/jfe/form/SV_bOWahYvH6tOwoMB"
 	intermediatesurveys = {
 		"ab": "http://mit.co1.qualtrics.com/jfe/form/SV_bOWahYvH6tOwoMB",
 		"mb": "http://mit.co1.qualtrics.com/jfe/form/SV_bOWahYvH6tOwoMB",
